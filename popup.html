@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ImpulseGuard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>ImpulseGuard</h1>
+  
+  <label>Focus Duration:</label>
+  <select id="duration">
+    <option value="30">30 minutes</option>
+    <option value="60">60 minutes</option>
+    <option value="90">90 minutes</option>
+  </select>
+
+  <label>Whitelist URLs (comma separated):</label>
+  <textarea id="whitelist" rows="4" placeholder="e.g., notion.so, chat.openai.com"></textarea>
+
+  <button id="start">Start Focus</button>
+  <button id="stop">Stop</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
