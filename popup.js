@@ -40,3 +40,9 @@ document.getElementById("start").addEventListener("click", () => {
 
   window.close();
 });
+
+document.getElementById("stop").addEventListener("click", () => {
+  chrome.storage.local.clear(() => {
+    window.close();
+  });
+});
