@@ -6,7 +6,7 @@ body {
   font-family: sans-serif;
   background-color: yellow;
   color: navy;
-  border: 10px solid red;
+  border-radius: 50px;
 }
 
 #tab-list {
@@ -19,4 +19,5 @@ body {
 button {
   margin-right: 10px;
   padding: 6px 12px;
+  border-radius: 5px;
 }
