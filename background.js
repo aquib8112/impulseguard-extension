@@ -7,7 +7,13 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 function isUrlWhitelisted(url, whitelist) {
-  return whitelist.some(domain => url.includes(domain));
+  try {
+    const hostname = new URL(url).hostname;
+    return whitelist.includes(hostname);
+  } catch (err) {
+    console.warn("Invalid URL in checkTab:", url);
+    return false;
+  }
 }
 
 async function checkTab(tabId, changeInfo, tab) {
