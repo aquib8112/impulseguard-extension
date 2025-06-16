@@ -5,26 +5,53 @@
   <title>ImpulseGuard</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body style="border-radius:50%;">
-  <h1>ImpulseGuard</h1>
+<body>
+  <div class="container">
+<div class="header">
+<div class="image"><img src="./resouces/head.png" alt=""></div>
+<h1>ImpulseGuard</h1>
+</div>
+
+
+<!---------------------------TIMER SECTION ------------------------->
+<div class="timer">
+<div class="time-box">
+      <input type="number" id="hours" min="0" value="0">
+      <label>Hours</label>
+    </div>
+    <div class="time-box">
+      <input type="number" id="minutes" min="0" max="59" value="0">
+      <label>Minutes</label>
+    </div>
+    <div class="time-box">
+      <input type="number" id="seconds" min="0" max="59" value="0">
+      <label>Seconds</label>
+    </div>
+
+</div>
   
-  <label>Focus Duration:</label>
-  <select id="duration">
-    <option value="30">30 minutes</option>
-    <option value="60">60 minutes</option>git 
-    <option value="90">90 minutes</option>
-  </select>
+
 
   <!--<label>Whitelist URLs (comma separated):</label> -->
   <div id="tab-list">
-  <p>Select tabs to allow during focus session:</p>
+ 
   <!-- checkboxes will be injected here -->
+  </div>
+<!-- 
+
+  <button id="start">Start Focus</button>
+  <button id="stop">Stop</button> -->
+  <!--------------------------- START/Pause BUTTON--------------------- -->
+
+ <div class="button-wrapper">
+    <button id="startPauseBtn">START</button>
   </div>
 
 
-  <button id="start">Start Focus</button>
-  <button id="stop">Stop</button>
 
+
+  </div>
+  <script src="script.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
