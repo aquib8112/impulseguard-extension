@@ -48,25 +48,76 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.getElementById("start").addEventListener("click", () => {
-  const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
-  const whitelist = Array.from(checkboxes).map(cb => cb.value);
+const hrInput = document.getElementById('hours');
+const minInput = document.getElementById('minutes');
+const secInput = document.getElementById('seconds');
+const startPauseBtn = document.getElementById('startPauseBtn');
 
-  const duration = parseInt(document.getElementById("duration").value);
+let interval = null;
+let isRunning = false;
 
-  chrome.storage.local.set({
-    focusSession: {
-      active: true,
-      endTime: Date.now() + duration * 60 * 1000,
-      whitelist: whitelist,
+function getTotalSeconds() {
+  return (
+    parseInt(hrInput.value || 0) * 3600 +
+    parseInt(minInput.value || 0) * 60 +
+    parseInt(secInput.value || 0)
+  );
+}
+
+function updateInputsFromSeconds(totalSeconds) {
+  const hrs = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  hrInput.value = hrs;
+  minInput.value = mins;
+  secInput.value = secs;
+}
+
+function startCountdown(total) {
+  interval = setInterval(() => {
+    if (total <= 0) {
+      clearInterval(interval);
+      chrome.storage.local.clear();
+      startPauseBtn.textContent = "Start";
+      isRunning = false;
+      hrInput.disabled = minInput.disabled = secInput.disabled = false;
+      return;
     }
-  });
+    total--;
+    updateInputsFromSeconds(total);
+  }, 1000);
+}
 
-  window.close();
-});
+startPauseBtn.addEventListener("click", () => {
+  if (!isRunning) {
+    const totalSeconds = getTotalSeconds();
+    if (totalSeconds <= 0) return;
 
-document.getElementById("stop").addEventListener("click", () => {
-  chrome.storage.local.clear(() => {
+    const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
+    const whitelist = Array.from(checkboxes).map(cb => cb.value);
+
+    chrome.storage.local.set({
+      focusSession: {
+        active: true,
+        endTime: Date.now() + totalSeconds * 1000,
+        whitelist: whitelist,
+      }
+    });
+
+    startCountdown(totalSeconds);
+    startPauseBtn.textContent = "Stop";
+    isRunning = true;
+    hrInput.disabled = minInput.disabled = secInput.disabled = true;
+    
+
+  } else {
+    clearInterval(interval);
+    chrome.storage.local.clear();
+    startPauseBtn.textContent = "Start";
+    isRunning = false;
+    hrInput.disabled = minInput.disabled = secInput.disabled = false;
     window.close();
-  });
+
+  }
 });
