@@ -16,7 +16,19 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "resouces/head.png",
+      "32": "resouces/head.png",
+      "48": "resouces/head.png",
+      "128": "resouces/head.png"
+    }
+  },
+  "icons": {
+    "16": "resouces/head.png",
+    "32": "resouces/head.png",
+    "48": "resouces/head.png",
+    "128": "resouces/head.png"
   },
   "content_scripts": [
     {
