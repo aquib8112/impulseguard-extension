@@ -107,11 +107,18 @@ function startCountdown(total) {
 }
 
 startPauseBtn.addEventListener("click", () => {
+  const warningMsg = document.getElementById("warning-message");
   if (!isRunning) {
     const totalSeconds = getTotalSeconds();
     if (totalSeconds <= 0) return;
 
     const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
+
+    if (checkboxes.length === 0) {warningMsg.classList.add("show");
+      setTimeout(() => {warningMsg.classList.remove("show");}, 3000); // fade after 3 seconds
+      return;
+    }
+
     const whitelist = Array.from(checkboxes).map(cb => cb.value);
 
     chrome.storage.local.set({
