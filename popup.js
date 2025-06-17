@@ -46,6 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(div);
     });
   });
+
+chrome.storage.local.get("focusSession", (data) => {
+    const session = data.focusSession;
+    if (session && session.active) {
+      const timeLeft = Math.floor((session.endTime - Date.now()) / 1000);
+      if (timeLeft > 0) {
+        updateInputsFromSeconds(timeLeft);
+        startCountdown(timeLeft);
+        startPauseBtn.textContent = "Stop";
+        isRunning = true;
+        hrInput.disabled = minInput.disabled = secInput.disabled = true;
+      } else {
+        chrome.storage.local.clear();
+      }
+    }
+  });
+
 });
 
 const hrInput = document.getElementById('hours');
@@ -76,7 +93,7 @@ function updateInputsFromSeconds(totalSeconds) {
 
 function startCountdown(total) {
   interval = setInterval(() => {
-    if (total <= 0) {
+    if (--total <= 0) {
       clearInterval(interval);
       chrome.storage.local.clear();
       startPauseBtn.textContent = "Start";
@@ -109,7 +126,7 @@ startPauseBtn.addEventListener("click", () => {
     startPauseBtn.textContent = "Stop";
     isRunning = true;
     hrInput.disabled = minInput.disabled = secInput.disabled = true;
-    
+    window.close();
 
   } else {
     clearInterval(interval);
