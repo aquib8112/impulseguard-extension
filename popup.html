@@ -1,46 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ImpulseGuard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impulse Guard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-<div class="header">
-<div class="image"><img src="./resouces/head.png" alt=""></div>
-<h1>Impulse Guard</h1>
-</div>
+  <div class="header">
+    <span>🧠</span>
+    <span>Impulse Guard</span>
+    <div class="pulse-dot"></div>
+  </div>
 
-<!---------------------------TIMER SECTION ------------------------->
-<div class="timer">
-<div class="time-box">
-      <input type="number" id="hours" min="0" value="1">
-      <label>Hours</label>
+  <div class="section-label">Select Duration</div>
+  <div class="time-picker">
+    <div class="time-box">
+      <input type="number" id="hours" value="01" min="0" max="23" maxlength="2">
+      <small>Hours</small>
     </div>
     <div class="time-box">
-      <input type="number" id="minutes" min="0" max="59" value="30">
-      <label>Minutes</label>
+      <input type="number" id="minutes" value="30" min="0" max="59" maxlength="2">
+      <small>Minutes</small>
     </div>
     <div class="time-box">
-      <input type="number" id="seconds" min="0" max="59" value="0">
-      <label>Seconds</label>
+      <input type="number" id="seconds" value="00" min="0" max="59" maxlength="2">
+      <small>Seconds</small>
     </div>
-</div>
-
-  <div id="tab-list">
-  <!-- checkboxes will be injected here -->
   </div>
 
-  <!--------------------------- START/STOP BUTTON--------------------- -->
+  <div class="section-label">Select Tab</div>
+  <div class="tab-list" id="tab-list"></div>
 
-  <div class="button-wrapper">
-    <button id="startPauseBtn">START</button>
+  <div id="control-buttons">
+    <button id="initialStartBtn" class="btn btn-start">
+      <span class="btn-icon">▶</span>
+      <span>START</span>
+    </button>
+    <div id="sessionControls" style="display: none;">
+      <div class="btn-group" >
+        <button id="pauseBtn" class="btn btn-pause">
+          <span class="btn-icon">⏸</span>
+          <span>PAUSE</span>
+        </button>
+        
+        <button id="stopBtn" class="btn btn-stop">
+          <span class="btn-icon">⏹</span>
+          <span>STOP</span>
+        </button>
+
+      </div>
+    </div>
   </div>
-  <p id="warning-message" class="fade-warning">Please select at least one tab before starting.</p>
-  </div>
-  
-  <script src="script.js"></script>
+
+
+  <div id="floating-warning" class="floating-warning">Please select at least one tab before starting.</div>
+
   <script src="popup.js"></script>
 </body>
 </html>
