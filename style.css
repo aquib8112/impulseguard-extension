@@ -1,154 +1,259 @@
-
-
-*{
-  box-sizing: border-box;
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
   margin: 0;
-  padding: 0;
-}
-#tab-list {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  max-height: 400px;
-  overflow-y: auto;
-  
-}
-body{
-  overflow: hidden;
-  border: 20px;
 }
 
-button {
-  margin-right: 10px;
-  padding: 6px 12px;
-  border-radius: 5px;
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.5rem;
+  text-align: center;
+  width: 100%;
+  font-weight: 700;
+  color: black;
+  caret-color: black;
 }
-.container{
-background: #101218;
-width: 500;
-height: 600;
-padding: 40px;
-border-radius: 20px;
-  
-}
-.header{
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #111827;
+  color: white;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 50px;
-}
-.header > h1{
-
-font-family: Inter;
-font-weight:700;
-font-size: 32px;
-text-align: center;
-line-height: 100%;
-vertical-align: middle;
-color: #FFFFFF;
-
-
-}
-.image> img{
-  width: 50px;
-  height:50px;
-  border-radius: 50%;
-  margin-right: 10px;
+  padding: 1rem;
+  width: 350px;
+  height: 550px;
+  box-sizing: border-box;
 }
 
-
-/* timer section */
-
-.timer {
+.header {
   display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.pulse-dot {
+  position: absolute;
+  top: 2px;
+  right: 120px;
+  width: 6px;
+  height: 6px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.section-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  }
+
+.time-picker {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
 }
 
 .time-box {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  background-color: #d1d5db;
+  color: black;
+  border-radius: 1rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
 }
 
-.time-box input {
-  font-size: 25px;
-  width: 50px;
-  text-align: center;
-  border: none;
-  border-bottom: 2px solid #333;
+.time-box small {
+  font-size: 0.7rem;
+  color: #333;
+}
+
+.tab-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 320px;
+  overflow-y: auto;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  scrollbar-width: none;
+}
+
+.tab-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-list::-webkit-scrollbar-track {
   background: transparent;
-  outline: none;
 }
 
-label {
-  display: block;
-  margin-top: 5px;
-  color: #555;
+.tab-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  border: none;
 }
-.button-wrapper{
-    display: flex;
+
+.item {
+  background-color: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+}
+
+.item label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.item input[type="checkbox"] {
+  appearance: none;
+  width: 34px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.item input[type="checkbox"]:checked {
+  background: #4caf50;
+}
+
+.item input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.item input[type="checkbox"]:checked::before {
+  transform: translateX(16px);
+}
+
+.btn {
+  width: 100%;
+  font-weight: bold;
+  font-size: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
-.button-wrapper button {
-  padding: 10px 30px;
-  font-size: 18px;
-  background-color:white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  color: #555;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 
-  
-}
-
-.button-wrapper button:hover {
-  background: #D9D9D9;
+.btn-start {
+  background-color: #d1d5db;
   color: black;
-
 }
 
+.btn-start:hover {
+  background-color: #c0c0c0;
+  transform: scale(1.05);
+}
 
-/* TAB CSS */
-
-
-
-
-.tab-item {
+.btn-pause,
+.btn-stop {
+  flex: 1;
   display: flex;
+  justify-content: center;
   align-items: center;
-  background-color: #f9f9f9;
-  padding: 10px 20px;
-  margin-bottom: 5px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease-in-out;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
 }
 
-.tab-item:hover {
-  background-color: #e0e0e0;
+.btn-pause {
+  background-color: #facc15;
+  color: black;
 }
 
-.tab-item input[type="checkbox"] {
-  margin-right: 8px;
-}
-
-.tab-item img {
-  border-radius: 24px;
-}
-
-.fade-warning {
+.btn-stop {
+  background-color: #ef4444;
   color: white;
-  font-size: 10px;
-  margin-top: 16px;
-  opacity: 0;
-  text-align: center;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-  height: 14px; /* preserves layout even when hidden */
 }
-.fade-warning.show {
+
+.btn-pause:hover,
+.btn-stop:hover {
+  transform: scale(1.05);
+}
+
+.btn-group {
+  display: flex;
+  width: 100%;
+  gap: 0.4rem;
+}
+
+.btn-icon {
+  display: inline-block;
+  line-height: 1;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+.floating-warning {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  color: black;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+.floating-warning.show {
   opacity: 1;
+  pointer-events: auto;
 }

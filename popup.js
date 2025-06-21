@@ -1,74 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-  chrome.tabs.query({}, (tabs) => {
-    const container = document.getElementById("tab-list");
-
-    tabs.forEach((tab) => {
-      const div = document.createElement("div");
-
-      const domain = new URL(tab.url).hostname;
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.value = domain;
-
-      const favicon = document.createElement("img");
-      favicon.src = tab.favIconUrl || "";  // Try original icon first
-      favicon.style.width = "16px";
-      favicon.style.height = "16px";
-      favicon.style.verticalAlign = "middle";
-      favicon.style.marginRight = "5px";
-
-      favicon.onerror = () => {
-        favicon.onerror = null;  // Avoid infinite loop
-        favicon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-      };
-
-      const label = document.createElement("label");
-
-      // ✅ Truncate title and add tooltip
-      const maxLen = 28;
-      const fullTitle = tab.title || tab.url;
-      const shortTitle = fullTitle.length > maxLen ? fullTitle.slice(0, maxLen - 1) + "…" : fullTitle;
-      label.textContent = shortTitle;
-      label.title = fullTitle;
-
-      // ✅ Style for truncation
-      label.style.whiteSpace = "nowrap";
-      label.style.overflow = "hidden";
-      label.style.textOverflow = "ellipsis";
-      label.style.display = "inline-block";
-      label.style.maxWidth = "250px";
-      label.style.marginLeft = "5px";
-
-      div.appendChild(checkbox);
-      div.appendChild(favicon);
-      div.appendChild(label);
-      container.appendChild(div);
-    });
-  });
-
-chrome.storage.local.get("focusSession", (data) => {
-    const session = data.focusSession;
-    if (session && session.active) {
-      const timeLeft = Math.floor((session.endTime - Date.now()) / 1000);
-      if (timeLeft > 0) {
-        updateInputsFromSeconds(timeLeft);
-        startCountdown(timeLeft);
-        startPauseBtn.textContent = "Stop";
-        isRunning = true;
-        hrInput.disabled = minInput.disabled = secInput.disabled = true;
-      } else {
-        chrome.storage.local.clear();
-      }
-    }
-  });
-
-});
-
 const hrInput = document.getElementById('hours');
 const minInput = document.getElementById('minutes');
 const secInput = document.getElementById('seconds');
-const startPauseBtn = document.getElementById('startPauseBtn');
+
+const hourInput = document.getElementById("hours");
+const minuteInput = document.getElementById("minutes");
+const secondInput = document.getElementById("seconds");
+
+const startBtn = document.getElementById("initialStartBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn = document.getElementById("stopBtn");
+const sessionControls = document.getElementById("sessionControls");
 
 let interval = null;
 let isRunning = false;
@@ -106,42 +47,159 @@ function startCountdown(total) {
   }, 1000);
 }
 
-startPauseBtn.addEventListener("click", () => {
-  const warningMsg = document.getElementById("warning-message");
-  if (!isRunning) {
-    const totalSeconds = getTotalSeconds();
-    if (totalSeconds <= 0) return;
+function handlePause(){console.log("Pause clicked");}
 
-    const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
+function handleStop(){
+  console.log("Stop clicked");
 
-    if (checkboxes.length === 0) {warningMsg.classList.add("show");
-      setTimeout(() => {warningMsg.classList.remove("show");}, 3000); // fade after 3 seconds
-      return;
-    }
+  clearInterval(interval);
+  chrome.storage.local.clear();
 
-    const whitelist = Array.from(checkboxes).map(cb => cb.value);
+  document.getElementById("initialStartBtn").style.display = "inline-block";
+  document.getElementById("sessionControls").style.display = "none";
 
-    chrome.storage.local.set({
-      focusSession: {
-        active: true,
-        endTime: Date.now() + totalSeconds * 1000,
-        whitelist: whitelist,
+  isRunning = false;
+  hrInput.disabled = minInput.disabled = secInput.disabled = false;
+}
+
+function checkSession() {
+  chrome.storage.local.get("focusSession", (data) => {
+    const session = data.focusSession;
+    if (session && session.active) {
+      const timeLeft = Math.floor((session.endTime - Date.now()) / 1000);
+      if (timeLeft > 0) {
+        updateInputsFromSeconds(timeLeft);
+        startCountdown(timeLeft);
+
+        document.getElementById("initialStartBtn").style.display = "none";
+        document.getElementById("sessionControls").style.display = "block";
+
+        isRunning = true;
+        hrInput.disabled = minInput.disabled = secInput.disabled = true;
+      } else {
+        chrome.storage.local.clear();
       }
+    }
+  });
+}
+
+function showFloatingWarning(message = "Please select at least one tab before starting.") {
+  const warning = document.getElementById("floating-warning");
+  warning.textContent = message;
+  warning.classList.add("show");
+
+  const removeWarning = () => {
+    warning.classList.remove("show");
+    document.removeEventListener("click", removeWarning, true);
+    document.removeEventListener("keydown", removeWarning, true);
+  };
+
+  // Remove on any interaction or after 300ms
+  setTimeout(removeWarning, 2000);
+  document.addEventListener("click", removeWarning, true);
+  document.addEventListener("keydown", removeWarning, true);
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.tabs.query({}, (tabs) => {
+    const container = document.getElementById("tab-list");
+
+    tabs.forEach((tab) => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      const domain = new URL(tab.url).hostname;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = domain;
+
+      const favicon = document.createElement("img");
+      favicon.src = tab.favIconUrl || "";
+      favicon.style.width = "16px";
+      favicon.style.height = "16px";
+      favicon.style.verticalAlign = "middle";
+      favicon.style.marginRight = "5px";
+
+      favicon.onerror = () => {
+        favicon.onerror = null;
+        favicon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+      };
+
+      const label = document.createElement("label");
+      label.style.whiteSpace = "nowrap";
+      label.style.overflow = "hidden";
+      label.style.textOverflow = "ellipsis";
+      label.style.display = "inline-block";
+      label.style.maxWidth = "250px";
+      label.style.marginLeft = "5px";
+
+      const maxLen = 28;
+      const fullTitle = tab.title || tab.url;
+      const shortTitle = fullTitle.length > maxLen ? fullTitle.slice(0, maxLen - 1) + "…" : fullTitle;
+      label.textContent = shortTitle;
+      label.title = fullTitle;
+
+      const innerLabel = document.createElement("label");
+      innerLabel.className = "label";
+      innerLabel.appendChild(favicon);
+      innerLabel.appendChild(label);
+
+      div.appendChild(innerLabel);
+      div.appendChild(checkbox);
+
+      container.appendChild(div);
     });
+  });
 
-    startCountdown(totalSeconds);
-    startPauseBtn.textContent = "Stop";
-    isRunning = true;
-    hrInput.disabled = minInput.disabled = secInput.disabled = true;
-    window.close();
-
-  } else {
-    clearInterval(interval);
-    chrome.storage.local.clear();
-    startPauseBtn.textContent = "Start";
-    isRunning = false;
-    hrInput.disabled = minInput.disabled = secInput.disabled = false;
-    window.close();
-
-  }
+  checkSession();
 });
+
+[hourInput, minuteInput, secondInput].forEach((input) => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, 2); // digits only, max 2
+  });
+
+  input.addEventListener("blur", () => {
+    const max = input.id === "hours" ? 23 : 59;
+    let val = parseInt(input.value);
+    if (isNaN(val)) val = 0;
+    val = Math.min(Math.max(val, 0), max);
+    input.value = val < 10 ? "0" + val : "" + val;
+  });
+});
+
+startBtn.addEventListener("click", () => {
+  const totalSeconds = getTotalSeconds();
+  if (totalSeconds <= 0) return;
+
+  const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
+  
+  if (checkboxes.length === 0) {
+    showFloatingWarning();
+    return;
+  }
+
+  const whitelist = Array.from(checkboxes).map(cb => cb.value);
+
+  chrome.storage.local.set({
+    focusSession: {
+      active: true,
+      endTime: Date.now() + totalSeconds * 1000,
+      whitelist: whitelist,
+    }
+  });
+
+  startCountdown(totalSeconds);
+
+  // Switch UI state
+  startBtn.style.display = "none";
+  sessionControls.style.display = "block";
+
+  isRunning = true;
+  hrInput.disabled = minInput.disabled = secInput.disabled = true;
+});
+
+pauseBtn.addEventListener("click", handlePause);
+stopBtn.addEventListener("click", handleStop);
