@@ -47,41 +47,115 @@ function startCountdown(total) {
   }, 1000);
 }
 
-function handlePause(){console.log("Pause clicked");}
+function updateUIState(state) {
+  const startBtn = document.getElementById("initialStartBtn");
+  const sessionControls = document.getElementById("sessionControls");
 
-function handleStop(){
-  console.log("Stop clicked");
+  if (state === "idle") {
+    startBtn.style.display = "inline-block";
+    sessionControls.style.display = "none";
+    isRunning = false;
+    hrInput.disabled = minInput.disabled = secInput.disabled = false;
+  }
 
-  clearInterval(interval);
-  chrome.storage.local.clear();
+  if (state === "running") {
+    startBtn.style.display = "none";
+    sessionControls.style.display = "block";
+    isRunning = true;
+    hrInput.disabled = minInput.disabled = secInput.disabled = true;
+  }
 
-  document.getElementById("initialStartBtn").style.display = "inline-block";
-  document.getElementById("sessionControls").style.display = "none";
-
-  isRunning = false;
-  hrInput.disabled = minInput.disabled = secInput.disabled = false;
+  if (state === "paused") {
+    startBtn.style.display = "none";
+    sessionControls.style.display = "block";
+    isRunning = false;
+    hrInput.disabled = minInput.disabled = secInput.disabled = true;
+  }
 }
+
+function saveSession(session) {
+  chrome.storage.local.set({ focusSession: session });
+}
+
+function getTimeLeft(session) {
+  return Math.floor((session.endTime - Date.now()) / 1000);
+}
+
+
+function handlePauseResume() {
+  const pauseBtn = document.getElementById("pauseBtn");
+
+  chrome.storage.local.get("focusSession", (data) => {
+    const session = data.focusSession || {};
+
+    if (session.status === "running") {
+      clearInterval(interval);
+      const remaining = getTotalSeconds();
+
+      session.status = "paused";
+      session.remainingTime = remaining;
+      delete session.endTime;
+
+      pauseBtn.textContent = "▶ RESUME";
+      pauseBtn.style.backgroundColor = "#d1d5db";
+      updateUIState("paused");
+    } else if (session.status === "paused") {
+      const remaining = session.remainingTime;
+
+      session.status = "running";
+      session.endTime = Date.now() + remaining * 1000;
+      delete session.remainingTime;
+
+      pauseBtn.textContent = "⏸ PAUSE";
+      pauseBtn.style.backgroundColor = "#facc15";
+      startCountdown(remaining);
+      updateUIState("running");
+    }
+
+    saveSession(session);
+  });
+}
+
+function handleStop() {
+  chrome.storage.local.get("focusSession", (data) => {
+    const session = data.focusSession;
+    if (!session || !session.originalTime) return;
+
+    clearInterval(interval);
+    chrome.storage.local.clear();
+
+    updateInputsFromSeconds(session.originalTime);
+    updateUIState("idle");
+  });
+}
+
 
 function checkSession() {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession;
-    if (session && session.active) {
-      const timeLeft = Math.floor((session.endTime - Date.now()) / 1000);
+    if (!session || session.status === "idle") return;
+
+    if (session.status === "paused" && session.remainingTime) {
+      updateInputsFromSeconds(session.remainingTime);
+      updateUIState("paused");
+
+      const pauseBtn = document.getElementById("pauseBtn");
+      pauseBtn.textContent = "▶ RESUME";
+      pauseBtn.style.backgroundColor = "#d1d5db";
+    } else if (session.status === "running" && session.endTime) {
+      const timeLeft = getTimeLeft(session);
       if (timeLeft > 0) {
         updateInputsFromSeconds(timeLeft);
         startCountdown(timeLeft);
-
-        document.getElementById("initialStartBtn").style.display = "none";
-        document.getElementById("sessionControls").style.display = "block";
-
-        isRunning = true;
-        hrInput.disabled = minInput.disabled = secInput.disabled = true;
+        updateUIState("running");
       } else {
         chrome.storage.local.clear();
+        updateUIState("idle");
       }
     }
   });
 }
+
 
 function showFloatingWarning(message = "Please select at least one tab before starting.") {
   const warning = document.getElementById("floating-warning");
@@ -175,7 +249,6 @@ startBtn.addEventListener("click", () => {
   if (totalSeconds <= 0) return;
 
   const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
-  
   if (checkboxes.length === 0) {
     showFloatingWarning();
     return;
@@ -183,23 +256,17 @@ startBtn.addEventListener("click", () => {
 
   const whitelist = Array.from(checkboxes).map(cb => cb.value);
 
-  chrome.storage.local.set({
-    focusSession: {
-      active: true,
-      endTime: Date.now() + totalSeconds * 1000,
-      whitelist: whitelist,
-    }
-  });
+  const session = {
+    status: "running",
+    endTime: Date.now() + totalSeconds * 1000,
+    originalTime: totalSeconds,
+    whitelist: whitelist
+  };
 
+  saveSession(session);
   startCountdown(totalSeconds);
-
-  // Switch UI state
-  startBtn.style.display = "none";
-  sessionControls.style.display = "block";
-
-  isRunning = true;
-  hrInput.disabled = minInput.disabled = secInput.disabled = true;
+  updateUIState("running");
 });
 
-pauseBtn.addEventListener("click", handlePause);
+pauseBtn.addEventListener("click", handlePauseResume);
 stopBtn.addEventListener("click", handleStop);

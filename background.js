@@ -20,10 +20,11 @@ async function checkTab(tabId, changeInfo, tab) {
   const data = await chrome.storage.local.get("focusSession");
   const session = data.focusSession;
 
-  if (!session || !session.active) return;
+  if (!session || (session.status !== "running" && session.status !== "paused")) {
+    return;
+  }
 
   const blockedPageUrl = chrome.runtime.getURL("blocked.html");
-
   if (tab.url.startsWith(blockedPageUrl)) return; // Prevent loop
 
   if (!isUrlWhitelisted(tab.url, session.whitelist)) {
@@ -35,7 +36,9 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   const data = await chrome.storage.local.get("focusSession");
   const session = data.focusSession;
 
-  if (!session || !session.active) return;
+  if (!session || (session.status !== "running" && session.status !== "paused")) {
+    return;
+  }
 
   const blockedPageUrl = chrome.runtime.getURL("blocked.html");
   const url = tab.pendingUrl || tab.url || "";
