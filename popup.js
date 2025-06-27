@@ -56,6 +56,8 @@ function updateUIState(state) {
     sessionControls.style.display = "none";
     isRunning = false;
     hrInput.disabled = minInput.disabled = secInput.disabled = false;
+
+    if (stopBtn) stopBtn.disabled = false;
   }
 
   if (state === "running") {
@@ -63,6 +65,8 @@ function updateUIState(state) {
     sessionControls.style.display = "block";
     isRunning = true;
     hrInput.disabled = minInput.disabled = secInput.disabled = true;
+
+    if (stopBtn) stopBtn.disabled = false;
   }
 
   if (state === "paused") {
@@ -70,6 +74,8 @@ function updateUIState(state) {
     sessionControls.style.display = "block";
     isRunning = false;
     hrInput.disabled = minInput.disabled = secInput.disabled = true;
+
+    if (stopBtn) stopBtn.disabled = true;
   }
 }
 
@@ -81,6 +87,20 @@ function getTimeLeft(session) {
   return Math.floor((session.endTime - Date.now()) / 1000);
 }
 
+function pauseSession(session, pauseBtn) {
+  clearInterval(interval);
+  const remaining = getTotalSeconds();
+
+  session.status = "paused";
+  session.remainingTime = remaining;
+  delete session.endTime;
+
+  pauseBtn.textContent = "▶ RESUME";
+  pauseBtn.style.backgroundColor = "#d1d5db";
+  updateUIState("paused");
+
+  saveSession(session);
+}
 
 function handlePauseResume() {
   const pauseBtn = document.getElementById("pauseBtn");
@@ -89,16 +109,7 @@ function handlePauseResume() {
     const session = data.focusSession || {};
 
     if (session.status === "running") {
-      clearInterval(interval);
-      const remaining = getTotalSeconds();
-
-      session.status = "paused";
-      session.remainingTime = remaining;
-      delete session.endTime;
-
-      pauseBtn.textContent = "▶ RESUME";
-      pauseBtn.style.backgroundColor = "#d1d5db";
-      updateUIState("paused");
+      pauseSession(session, pauseBtn);
     } else if (session.status === "paused") {
       const remaining = session.remainingTime;
 
@@ -110,22 +121,40 @@ function handlePauseResume() {
       pauseBtn.style.backgroundColor = "#facc15";
       startCountdown(remaining);
       updateUIState("running");
-    }
 
-    saveSession(session);
+      saveSession(session);
+
+      // Optional: Close visionboard when resuming
+      chrome.tabs.query({}, (tabs) => {
+        const vbTab = tabs.find(t => t.url && t.url.includes('visionboard.html'));
+        if (vbTab) chrome.tabs.remove(vbTab.id);
+      });
+    }
   });
 }
 
 function handleStop() {
+  const pauseBtn = document.getElementById("pauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+
   chrome.storage.local.get("focusSession", (data) => {
-    const session = data.focusSession;
-    if (!session || !session.originalTime) return;
+    const session = data.focusSession || {};
 
-    clearInterval(interval);
-    chrome.storage.local.clear();
+    if (session.status === "running") {
+      pauseSession(session, pauseBtn);
+      if (stopBtn) stopBtn.disabled = true; // Disable STOP during impulse break
+    }
 
-    updateInputsFromSeconds(session.originalTime);
-    updateUIState("idle");
+    chrome.tabs.query({}, (tabs) => {
+      const existing = tabs.find(
+        (t) => t.url && t.url.startsWith(chrome.runtime.getURL("visionboard.html"))
+      );
+      if (existing) {
+        chrome.tabs.update(existing.id, { active: true });
+      } else {
+        chrome.tabs.create({ url: chrome.runtime.getURL("visionboard.html") });
+      }
+    });
   });
 }
 
@@ -156,7 +185,6 @@ function checkSession() {
   });
 }
 
-
 function showFloatingWarning(message = "Please select at least one tab before starting.") {
   const warning = document.getElementById("floating-warning");
   warning.textContent = message;
@@ -173,7 +201,6 @@ function showFloatingWarning(message = "Please select at least one tab before st
   document.addEventListener("click", removeWarning, true);
   document.addEventListener("keydown", removeWarning, true);
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
   chrome.tabs.query({}, (tabs) => {

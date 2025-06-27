@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vision Board</title>
+  <link rel="stylesheet" href="visionboard.css" />
+</head>
+<body>
+  <svg class="timer" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="10" fill="none" />
+    <circle
+      id="progress"
+      cx="50"
+      cy="50"
+      r="40"
+      stroke="#3b82f6"
+      stroke-width="10"
+      fill="none"
+      class="circle"
+      stroke-linecap="round"
+    />
+    <text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" id="timer-text">90</text>
+  </svg>
+
+  <img src="resouces/image.png" alt="Vision Goal" class="vision-image" />
+
+  <button class="stop-button" id="stop-button" disabled>STOP</button>
+
+  <script src="visionboard.js"></script>
+</body>
+</html>
