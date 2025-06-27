@@ -8,8 +8,13 @@ chrome.runtime.onInstalled.addListener(() => {
 
 function isUrlWhitelisted(url, whitelist) {
   try {
-    const hostname = new URL(url).hostname;
-    return whitelist.includes(hostname);
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.protocol === "chrome-extension:" && parsedUrl.pathname === "/visionboard.html") {
+      return true;
+    }
+
+    return whitelist.includes(parsedUrl.hostname);
   } catch (err) {
     console.warn("Invalid URL in checkTab:", url);
     return false;
@@ -25,9 +30,21 @@ async function checkTab(tabId, changeInfo, tab) {
   }
 
   const blockedPageUrl = chrome.runtime.getURL("blocked.html");
-  if (tab.url.startsWith(blockedPageUrl)) return; // Prevent loop
+  try {
+    if (!tab.url) return;
+    const parsed = new URL(tab.url);
 
-  if (!isUrlWhitelisted(tab.url, session.whitelist)) {
+    if (parsed.protocol === "chrome-extension:" && parsed.pathname === "/visionboard.html") {
+      return;
+    }
+
+    if (tab.url.startsWith(blockedPageUrl)) return;
+
+    if (!isUrlWhitelisted(tab.url, session.whitelist)) {
+      chrome.tabs.update(tab.id, { url: blockedPageUrl });
+    }
+  } catch (err) {
+    console.warn("Invalid URL in checkTab:", tab.url);
     chrome.tabs.update(tab.id, { url: blockedPageUrl });
   }
 }
@@ -43,13 +60,20 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   const blockedPageUrl = chrome.runtime.getURL("blocked.html");
   const url = tab.pendingUrl || tab.url || "";
 
-  if (!url || url.startsWith(blockedPageUrl)) return;
+  if (!url || url.startsWith(blockedPageUrl) || url.startsWith("chrome-extension://")) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.pathname === "/visionboard.html") return; 
+    } catch (e) {
+      return;
+    }
+    return;
+  }
 
   try {
     const hostname = new URL(url).hostname;
 
     if (!session.whitelist.includes(hostname)) {
-      // Close the new tab if not whitelisted
       chrome.tabs.remove(tab.id);
     }
   } catch (err) {

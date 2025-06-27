@@ -1,0 +1,60 @@
+body {
+      margin: 0;
+      background-color: #111827;
+      color: white;
+      font-family: sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .timer {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      z-index: 2;
+    }
+
+    .circle {
+      stroke-dasharray: 251.2;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .stop-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background-color: #dc2626;
+      color: white;
+      padding: 12px 20px;
+      font-weight: bold;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .stop-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .vision-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      z-index: 1;
+    }

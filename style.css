@@ -219,6 +219,11 @@ body {
   color: white;
 }
 
+.btn-stop:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-pause:hover,
 .btn-stop:hover {
   transform: scale(1.05);
