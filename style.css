@@ -212,49 +212,47 @@ body {
 }
 
 .btn {
-  width: 100px;
-  font-weight: bold;
-  font-size: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  padding: 10px 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
+/* Start Button */
 .btn-start {
-  background-color: #d1d5db;
-  color: black;
+  background-color: #e5e7eb; /* Tailwind gray-200 */
+  color: #111827; /* Tailwind gray-900 */
 }
 
 .btn-start:hover {
-  background-color: #c0c0c0;
-  transform: scale(1.05);
+  background-color: #d1d5db; /* Tailwind gray-300 */
 }
 
-.btn-pause,
-.btn-stop {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
-}
-
+/* Pause Button */
 .btn-pause {
-  background-color: #facc15;
-  color: black;
+  background-color: #facc15; /* Tailwind yellow-400 */
+  color: #1f2937; /* Tailwind gray-800 */
 }
 
+.btn-pause:hover {
+  background-color: #fbbf24; /* Tailwind yellow-300 */
+}
+
+/* Stop Button */
 .btn-stop {
-  background-color: #ef4444;
+  background-color: #ef4444; /* Tailwind red-500 */
   color: white;
+}
+
+.btn-stop:hover {
+  background-color: #dc2626; /* Tailwind red-600 */
 }
 
 .btn-stop:disabled {
@@ -262,21 +260,16 @@ body {
   cursor: not-allowed;
 }
 
-.btn-pause:hover,
-.btn-stop:hover {
-  transform: scale(1.05);
-}
-
+/* Group container */
 .btn-group {
   display: flex;
   width: 100%;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .btn-icon {
-  display: inline-block;
-  line-height: 1;
   font-size: 1rem;
+  line-height: 1;
   vertical-align: middle;
 }
 
