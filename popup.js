@@ -223,7 +223,9 @@ document.addEventListener("DOMContentLoaded", () => {
       favicon.className = "favicon";
       favicon.src = tab.favIconUrl || "";
       favicon.onerror = () => {
-        favicon.onerror = null;
+        favicon.onerror = () => {
+          favicon.src = "resouces/default_icon.png";
+        };
         favicon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
       };
 
