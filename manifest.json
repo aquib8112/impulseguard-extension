@@ -30,6 +30,12 @@
     "48": "resouces/head.png",
     "128": "resouces/head.png"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["resouces/default_icon.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
