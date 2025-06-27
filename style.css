@@ -132,14 +132,19 @@ body {
   justify-content: space-between;
   padding: 0.4rem 0.6rem;
   border-radius: 0.5rem;
+  position: relative; /* for blur overlay */
 }
 
 .item label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   font-size: 0.95rem;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: 0.75rem;
 }
 
 .item input[type="checkbox"] {
@@ -151,6 +156,7 @@ body {
   position: relative;
   cursor: pointer;
   transition: background 0.3s ease;
+  z-index: 1; /* keeps it on top of blur */
 }
 
 .item input[type="checkbox"]:checked {
@@ -171,6 +177,38 @@ body {
 
 .item input[type="checkbox"]:checked::before {
   transform: translateX(16px);
+}
+
+.item::after {
+  content: "";
+  position: absolute;
+  right: 42px; /* slightly more than toggle width */
+  top: 0;
+  height: 100%;
+  width: 30px;
+  background: linear-gradient(to left, #1f2937, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.label-container {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.favicon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn {

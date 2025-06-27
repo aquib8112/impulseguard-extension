@@ -216,38 +216,27 @@ document.addEventListener("DOMContentLoaded", () => {
       checkbox.type = "checkbox";
       checkbox.value = domain;
 
-      const favicon = document.createElement("img");
-      favicon.src = tab.favIconUrl || "";
-      favicon.style.width = "16px";
-      favicon.style.height = "16px";
-      favicon.style.verticalAlign = "middle";
-      favicon.style.marginRight = "5px";
+      const labelContainer = document.createElement("div");
+      labelContainer.className = "label-container";
 
+      const favicon = document.createElement("img");
+      favicon.className = "favicon";
+      favicon.src = tab.favIconUrl || "";
       favicon.onerror = () => {
         favicon.onerror = null;
         favicon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
       };
 
-      const label = document.createElement("label");
-      label.style.whiteSpace = "nowrap";
-      label.style.overflow = "hidden";
-      label.style.textOverflow = "ellipsis";
-      label.style.display = "inline-block";
-      label.style.maxWidth = "250px";
-      label.style.marginLeft = "5px";
-
-      const maxLen = 28;
+      const titleSpan = document.createElement("span");
+      titleSpan.className = "title";
       const fullTitle = tab.title || tab.url;
-      const shortTitle = fullTitle.length > maxLen ? fullTitle.slice(0, maxLen - 1) + "…" : fullTitle;
-      label.textContent = shortTitle;
-      label.title = fullTitle;
+      titleSpan.textContent = fullTitle;
+      titleSpan.title = fullTitle;
 
-      const innerLabel = document.createElement("label");
-      innerLabel.className = "label";
-      innerLabel.appendChild(favicon);
-      innerLabel.appendChild(label);
+      labelContainer.appendChild(favicon);
+      labelContainer.appendChild(titleSpan);
 
-      div.appendChild(innerLabel);
+      div.appendChild(labelContainer);
       div.appendChild(checkbox);
 
       container.appendChild(div);
