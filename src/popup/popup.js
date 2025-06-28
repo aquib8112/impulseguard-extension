@@ -126,7 +126,7 @@ function handlePauseResume() {
 
       // Optional: Close visionboard when resuming
       chrome.tabs.query({}, (tabs) => {
-        const vbTab = tabs.find(t => t.url && t.url.includes('visionboard.html'));
+        const vbTab = tabs.find(t => t.url && t.url.includes('visionboard/visionboard.html'));
         if (vbTab) chrome.tabs.remove(vbTab.id);
       });
     }
@@ -146,13 +146,14 @@ function handleStop() {
     }
 
     chrome.tabs.query({}, (tabs) => {
+      const visionboardUrl = chrome.runtime.getURL("visionboard/visionboard.html");
       const existing = tabs.find(
-        (t) => t.url && t.url.startsWith(chrome.runtime.getURL("visionboard.html"))
+        (t) => t.url && t.url.startsWith(visionboardUrl)
       );
       if (existing) {
         chrome.tabs.update(existing.id, { active: true });
       } else {
-        chrome.tabs.create({ url: chrome.runtime.getURL("visionboard.html") });
+        chrome.tabs.create({ url: visionboardUrl });
       }
     });
   });
@@ -224,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
       favicon.src = tab.favIconUrl || "";
       favicon.onerror = () => {
         favicon.onerror = () => {
-          favicon.src = "resouces/default_icon.png";
+          favicon.src = "/resources/icons/default_icon.png";
         };
         favicon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
       };
