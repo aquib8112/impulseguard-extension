@@ -13,26 +13,29 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "16": "resouces/head.png",
-      "32": "resouces/head.png",
-      "48": "resouces/head.png",
-      "128": "resouces/head.png"
+      "16": "resources/icons/extension_icon.png",
+      "32": "resources/icons/extension_icon.png",
+      "48": "resources/icons/extension_icon.png",
+      "128": "resources/icons/extension_icon.png"
     }
   },
   "icons": {
-    "16": "resouces/head.png",
-    "32": "resouces/head.png",
-    "48": "resouces/head.png",
-    "128": "resouces/head.png"
+    "16": "resources/icons/extension_icon.png",
+    "32": "resources/icons/extension_icon.png",
+    "48": "resources/icons/extension_icon.png",
+    "128": "resources/icons/extension_icon.png"
   },
   "web_accessible_resources": [
     {
-      "resources": ["resouces/default_icon.png"],
+      "resources": 
+      ["resources/icons/default_icon.png"
+,      "blocked/blocked.html",
+      "visionboard/visionboard.html"],
       "matches": ["<all_urls>"]
     }
   ],
