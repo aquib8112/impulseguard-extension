@@ -126,6 +126,7 @@ body {
 }
 
 .item {
+  min-height: 24px;
   background-color: #1f2937;
   display: flex;
   align-items: center;
@@ -189,6 +190,10 @@ body {
   background: linear-gradient(to left, #1f2937, transparent);
   pointer-events: none;
   z-index: 0;
+}
+
+.item.no-blur::after {
+  display: none;
 }
 
 .label-container {
