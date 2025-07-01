@@ -1,0 +1,28 @@
+{
+  "name": "impulseguard-extension",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "content.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aquib8112/impulseguard-extension.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aquib8112/impulseguard-extension/issues"
+  },
+  "homepage": "https://github.com/aquib8112/impulseguard-extension#readme",
+  "description": "",
+  "devDependencies": {
+    "jest": "^30.0.3",
+    "jest-environment-jsdom": "^30.0.2"
+  }
+}

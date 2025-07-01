@@ -5,133 +5,75 @@ import {
   startCountdown,
   createNewSession,
   togglePauseResume,
-  
 } from './session.js';
 
 import { 
-  showFloatingWarning,
+  updateUIState,
   renderTabList,
-  disableTimerInputs,
-  setTabTogglesVisible
+  getTotalSeconds,
+  showFloatingWarning,
+  setupInputValidation,
+  updateInputsFromSeconds
 } from './ui.js';
 
-let isRunning = false;
-const hrInput = document.getElementById('hours');
-const minInput = document.getElementById('minutes');
-const secInput = document.getElementById('seconds');
-
-const startBtn = document.getElementById("initialStartBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-const stopBtn = document.getElementById("stopBtn");
-const sessionControls = document.getElementById("sessionControls");
-
-[hrInput, minInput, secInput].forEach((input) => {
-  input.addEventListener("input", () => {
-    input.value = input.value.replace(/\D/g, "").slice(0, 2); // digits only, max 2
-  });
-
-  input.addEventListener("blur", () => {
-    const max = input.id === "hours" ? 23 : 59;
-    let val = parseInt(input.value);
-    if (isNaN(val)) val = 0;
-    val = Math.min(Math.max(val, 0), max);
-    input.value = val < 10 ? "0" + val : "" + val;
-  });
-});
-
-function onEnd() {
-  hrInput.disabled = false;
-  minInput.disabled = false;
-  secInput.disabled = false;
-  updateUIState("idle");
-}
-
-function getTotalSeconds() {
-  return (
-    parseInt(hrInput.value || 0) * 3600 +
-    parseInt(minInput.value || 0) * 60 +
-    parseInt(secInput.value || 0)
-  );
-}
-
-function updateInputsFromSeconds(totalSeconds) {
-  const hrs = Math.floor(totalSeconds / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-
-  hrInput.value = hrs;
-  minInput.value = mins;
-  secInput.value = secs;
-}
-
-function updateUIState(state){
-  if (state === "idle") {
-    startBtn.style.display = "inline-block";
-    sessionControls.style.display = "none";
-    isRunning = false;
-    disableTimerInputs(false, hrInput, minInput, secInput);
-    setTabTogglesVisible(true);
-    if (stopBtn) stopBtn.disabled = false;
-  }
-
-  if (state === "running") {
-    startBtn.style.display = "none";
-    sessionControls.style.display = "block";
-    isRunning = true;
-    disableTimerInputs(true, hrInput, minInput, secInput);
-    setTabTogglesVisible(false);
-    if (stopBtn) stopBtn.disabled = false;
-  }
-
-  if (state === "paused") {
-    startBtn.style.display = "none";
-    sessionControls.style.display = "block";
-    isRunning = false;
-    disableTimerInputs(true, hrInput, minInput, secInput);
-    setTabTogglesVisible(false);
-    if (stopBtn) stopBtn.disabled = true;
-  }
+function onEnd(controller, timer) {
+  updateUIState("idle", controller, timer);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const hrInput = document.getElementById('hours');
+  const minInput = document.getElementById('minutes');
+  const secInput = document.getElementById('seconds');
+
+  const startBtn = document.getElementById("initialStartBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const sessionControls = document.getElementById("sessionControls");
+
+  const controller = {startBtn, stopBtn, pauseBtn, sessionControls};
+  const timer = {hrInput, minInput,secInput};
+
+  setupInputValidation(hrInput, minInput, secInput);
+
   chrome.tabs.query({}, (tabs) => {
     renderTabList(tabs);
   });
 
-  checkSession(pauseBtn, onEnd);
-});
+  checkSession(onEnd, updateUIState, updateInputsFromSeconds, controller, timer);
 
-startBtn.addEventListener("click", () => {
-  const totalSeconds = getTotalSeconds();
-  if (totalSeconds <= 0) return;
+  startBtn.addEventListener("click", () => {
+    const totalSeconds = getTotalSeconds(hrInput, minInput, secInput);
+    if (totalSeconds <= 0) return;
 
-  const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
-  if (checkboxes.length === 0) {
-    showFloatingWarning();
-    return;
-  }
+    const checkboxes = document.querySelectorAll("#tab-list input[type='checkbox']:checked");
+    if (checkboxes.length === 0) {
+      showFloatingWarning();
+      return;
+    }
 
-  const whitelist = Array.from(checkboxes).map(cb => cb.value);
-  const session = createNewSession(totalSeconds, whitelist);
+    const whitelist = Array.from(checkboxes).map(cb => cb.value);
+    const session = createNewSession(totalSeconds, whitelist);
 
-  saveSession(session);
-  startCountdown(totalSeconds, onEnd);
-  updateUIState("running");
-});
-
-pauseBtn.addEventListener("click", () => {
-  togglePauseResume({pauseBtn,onEnd});
-});
-
-stopBtn.addEventListener("click", () => {
-  chrome.storage.local.get("focusSession", (data) => {
-    const session = data.focusSession || {};
-    handleStop(session, pauseBtn, stopBtn);
+    saveSession(session);
+    startCountdown(totalSeconds, onEnd, updateInputsFromSeconds, controller, timer);
+    updateUIState("running",controller, timer);
   });
-});
 
-export{
-  updateUIState,
-  updateInputsFromSeconds,
-  getTotalSeconds,
-};
+  pauseBtn.addEventListener("click", () => {
+    
+    const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
+    togglePauseResume(totalSeconds, onEnd, updateUIState, updateInputsFromSeconds, controller, timer);
+
+  });
+
+  stopBtn.addEventListener("click", () => {
+    chrome.storage.local.get("focusSession", (data) => {
+      
+      const session = data.focusSession || {};
+      const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
+      handleStop(session, totalSeconds, updateUIState, controller, timer);
+
+    });
+  });
+
+});
