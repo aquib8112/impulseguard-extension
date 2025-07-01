@@ -28,6 +28,23 @@ function setTabTogglesVisible(visible) {
   });
 }
 
+function getTotalSeconds(hrInput, minInput, secInput) {
+  return (
+    parseInt(hrInput.value || 0) * 3600 +
+    parseInt(minInput.value || 0) * 60 +
+    parseInt(secInput.value || 0)
+  );
+}
+
+function updateInputsFromSeconds(totalSeconds, hrInput, minInput, secInput) {
+  const hrs = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  hrInput.value = hrs;
+  minInput.value = mins;
+  secInput.value = secs;
+}
 
 function showFloatingWarning(message = "Please select at least one tab before starting.") {
   const warning = document.getElementById("floating-warning");
@@ -44,6 +61,50 @@ function showFloatingWarning(message = "Please select at least one tab before st
   setTimeout(removeWarning, 2000);
   document.addEventListener("click", removeWarning, true);
   document.addEventListener("keydown", removeWarning, true);
+}
+
+function setupInputValidation(hrInput, minInput, secInput) {
+  if (!hrInput || !minInput || !secInput) return;
+
+  [hrInput, minInput, secInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "").slice(0, 2);
+    });
+
+    input.addEventListener("blur", () => {
+      const max = input.id === "hours" ? 23 : 59;
+      let val = parseInt(input.value);
+      if (isNaN(val)) val = 0;
+      val = Math.min(Math.max(val, 0), max);
+      input.value = val < 10 ? "0" + val : "" + val;
+    });
+  });
+}
+
+function updateUIState(state, controller, timer) {
+  if (state === "idle") {
+    controller.startBtn.style.display = "inline-block";
+    controller.sessionControls.style.display = "none";
+    disableTimerInputs(false, timer.hrInput, timer.minInput, timer.secInput);
+    setTabTogglesVisible(true);
+    if (controller.stopBtn) controller.stopBtn.disabled = false;
+  }
+
+  if (state === "running") {
+    controller.startBtn.style.display = "none";
+    controller.sessionControls.style.display = "block";
+    disableTimerInputs(true, timer.hrInput, timer.minInput, timer.secInput);
+    setTabTogglesVisible(false);
+    if (controller.stopBtn) controller.stopBtn.disabled = false;
+  }
+
+  if (state === "paused") {
+    controller.startBtn.style.display = "none";
+    controller.sessionControls.style.display = "block";
+    disableTimerInputs(true, timer.hrInput, timer.minInput, timer.secInput);
+    setTabTogglesVisible(false);
+    if (controller.stopBtn) controller.stopBtn.disabled = true;
+  }
 }
 
 function renderTabList(tabs) {
@@ -90,11 +151,15 @@ function renderTabList(tabs) {
 }
 
 export {
+  updateUIState,
   renderTabList,
-  updateUIForPausedState,
+  getTotalSeconds,
   disableTimerInputs,
+  showFloatingWarning,
+  setupInputValidation,
   setTabTogglesVisible,
+  updateUIForPausedState,
+  updateInputsFromSeconds,
   updatePauseButtonToResume,
   updateResumeButtonToPause,
-  showFloatingWarning
 };

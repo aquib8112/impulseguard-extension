@@ -1,4 +1,3 @@
-import {updateUIState, getTotalSeconds, updateInputsFromSeconds} from './popup.js';
 import { updatePauseButtonToResume, updateResumeButtonToPause } from './ui.js';
 
 let interval = null;
@@ -20,7 +19,7 @@ function createNewSession(totalSeconds, whitelist) {
   };
 }
 
-function startCountdown(totalSeconds, onEnd) {
+function startCountdown(totalSeconds, onEnd, updateInputsFromSeconds, controller, timer) {
   let remaining = totalSeconds;
 
   interval = setInterval(() => {
@@ -29,58 +28,58 @@ function startCountdown(totalSeconds, onEnd) {
     if (remaining <= 0) {
       clearInterval(interval);
       chrome.storage.local.clear();
-      onEnd(); // Handle what happens when timer ends
+      onEnd(controller, timer); // Handle what happens when timer ends
       return;
     }
 
-    updateInputsFromSeconds(remaining); // Handle UI updates every second
+    updateInputsFromSeconds(remaining, timer.hrInput, timer.minInput, timer.secInput); // Handle UI updates every second
   }, 1000);
 }
 
-function pauseSession(session, pauseBtn) {
+function pauseSession(session, totalSeconds, updateUIState, controller, timer) {
   clearInterval(interval);
-  const remaining = getTotalSeconds();
 
   session.status = "paused";
-  session.remainingTime = remaining;
+  session.remainingTime = totalSeconds;
   delete session.endTime;
 
-  updatePauseButtonToResume(pauseBtn);
-  updateUIState("paused");
+  updatePauseButtonToResume(controller.pauseBtn);
+  updateUIState("paused", controller, timer);
 
   saveSession(session);
 }
 
-function checkSession(pauseBtn, onEnd) {
+function checkSession(onEnd, updateUIState, updateInputsFromSeconds, controller, timer) {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession;
     if (!session || session.status === "idle") return;
 
     if (session.status === "paused" && session.remainingTime) {
-      updateInputsFromSeconds(session.remainingTime);
-      updateUIState("paused");
-      updatePauseButtonToResume(pauseBtn);
+      updateInputsFromSeconds(session.remainingTime, timer.hrInput, timer.minInput, timer.secInput);
+      updateUIState("paused", controller, timer);
+      updatePauseButtonToResume(controller.pauseBtn);
 
     } else if (session.status === "running" && session.endTime) {
       const timeLeft = getTimeLeft(session);
+      
       if (timeLeft > 0) {
-        updateInputsFromSeconds(timeLeft);
-        startCountdown(timeLeft, updateInputsFromSeconds, onEnd);
-        updateUIState("running");
+        updateInputsFromSeconds(timeLeft, timer.hrInput, timer.minInput, timer.secInput);
+        startCountdown(timeLeft, onEnd, updateInputsFromSeconds, controller, timer);
+        updateUIState("running", controller, timer);
       } else {
         chrome.storage.local.clear();
-        updateUIState("idle");
+        updateUIState("idle", controller, timer);
       }
     }
   });
 }
 
-function togglePauseResume({ pauseBtn, onEnd }) {
+function togglePauseResume(totalSeconds, onEnd, updateUIState, updateInputsFromSeconds, controller, timer) {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession || {};
 
     if (session.status === "running") {
-      pauseSession(session, pauseBtn);
+      pauseSession(session, totalSeconds, updateUIState, controller, timer);
     } else if (session.status === "paused") {
       const remaining = session.remainingTime;
 
@@ -88,10 +87,10 @@ function togglePauseResume({ pauseBtn, onEnd }) {
       session.endTime = Date.now() + remaining * 1000;
       delete session.remainingTime;
 
-      updateResumeButtonToPause(pauseBtn);
+      updateResumeButtonToPause(controller.pauseBtn);
 
-      startCountdown(remaining, updateInputsFromSeconds, onEnd);
-      updateUIState("running");
+      startCountdown(remaining, onEnd, updateInputsFromSeconds, controller, timer);
+      updateUIState("running", controller, timer);
 
       saveSession(session);
 
@@ -104,11 +103,11 @@ function togglePauseResume({ pauseBtn, onEnd }) {
   });
 }
 
-function handleStop(session, pauseBtn, stopBtn) {
+function handleStop(session, totalSeconds, updateUIState, controller, timer) {
   if (session.status === "running") {
-    pauseSession(session, pauseBtn);
-    if (stopBtn) stopBtn.disabled = true; // Disable STOP during impulse break
-    updateUIState("paused");
+    pauseSession(session, totalSeconds, updateUIState, controller, timer);
+    if (controller.stopBtn) controller.stopBtn.disabled = true; // Disable STOP during impulse break
+    updateUIState("paused", controller, timer);
   }
 
   chrome.tabs.query({}, (tabs) => {
@@ -126,12 +125,11 @@ function handleStop(session, pauseBtn, stopBtn) {
 
 
 export {
-  getTimeLeft,
-  startCountdown,
-  saveSession,
-  pauseSession,
-  checkSession,
   handleStop,
-  togglePauseResume,
-  createNewSession
+  getTimeLeft,
+  saveSession,
+  checkSession,
+  startCountdown,
+  createNewSession,
+  togglePauseResume
 };
