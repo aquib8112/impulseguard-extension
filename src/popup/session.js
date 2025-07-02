@@ -1,15 +1,20 @@
-import { updatePauseButtonToResume, updateResumeButtonToPause } from './ui.js';
-
 let interval = null;
-
+/**  @param {Object} session - The current focus session object. */
 function saveSession(session) {
   chrome.storage.local.set({ focusSession: session });
 }
 
+/**  @param {Object} session - The current focus session object. */
 function getTimeLeft(session) {
   return Math.floor((session.endTime - Date.now()) / 1000);
 }
 
+
+/**
+ * @param {number} totalSeconds - Total session time in seconds.
+ * @param {string[]} whitelist - Array of whitelisted tab URLs.
+ * @returns {Object} session - A newly created focus session object.
+ */
 function createNewSession(totalSeconds, whitelist) {
   return {
     status: "running",
@@ -19,7 +24,21 @@ function createNewSession(totalSeconds, whitelist) {
   };
 }
 
-function startCountdown(totalSeconds, onEnd, updateInputsFromSeconds, controller, timer) {
+
+/**
+ * @param {number} totalSeconds - Total countdown time in seconds.
+ * @param {function} onEnd - Function to call when timer ends.
+ * @param {function} updateInputsFromSeconds - Function to update timer input fields from seconds.
+ * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
+ * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
+ */
+function startCountdown(
+  totalSeconds, 
+  onEnd, 
+  updateInputsFromSeconds, 
+  controller, 
+  timer
+) {
   let remaining = totalSeconds;
 
   interval = setInterval(() => {
@@ -36,7 +55,24 @@ function startCountdown(totalSeconds, onEnd, updateInputsFromSeconds, controller
   }, 1000);
 }
 
-function pauseSession(session, totalSeconds, updateUIState, controller, timer) {
+/**
+ * @param {Object} session - The current focus session object.
+ * @param {number} totalSeconds - Total time in seconds remaining.
+ * @param {function} saveSession - Function to persist session to storage.
+ * @param {function} updateUIState - Function to update UI state.
+ * @param {function} updatePauseButtonToResume - Function to update pause button to resume state.
+ * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
+ * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
+ */
+function pauseSession(
+  session, 
+  totalSeconds,
+  saveSession,
+  updateUIState,
+  updatePauseButtonToResume,
+  controller, 
+  timer
+) {
   clearInterval(interval);
 
   session.status = "paused";
@@ -49,7 +85,26 @@ function pauseSession(session, totalSeconds, updateUIState, controller, timer) {
   saveSession(session);
 }
 
-function checkSession(onEnd, updateUIState, updateInputsFromSeconds, controller, timer) {
+/**
+ * @param {function} onEnd - Function to call when timer ends.
+ * @param {function} getTimeLeft - Function to calculate remaining session time.
+ * @param {function} updateUIState - Function to update UI state.
+ * @param {function} startCountdown - Function to start countdown timer.
+ * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
+ * @param {function} updatePauseButtonToResume - Function to update pause button to resume state.
+ * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
+ * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
+ */
+function checkSession(
+  onEnd,
+  getTimeLeft,
+  updateUIState, 
+  startCountdown,
+  updateInputsFromSeconds,
+  updatePauseButtonToResume,
+  controller, 
+  timer
+) {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession;
     if (!session || session.status === "idle") return;
@@ -74,12 +129,37 @@ function checkSession(onEnd, updateUIState, updateInputsFromSeconds, controller,
   });
 }
 
-function togglePauseResume(totalSeconds, onEnd, updateUIState, updateInputsFromSeconds, controller, timer) {
+
+/**
+ * @param {number} totalSeconds - Total time in seconds remaining.
+ * @param {function} onEnd - Function to call when timer ends.
+ * @param {function} saveSession - Function to persist session to storage.
+ * @param {function} pauseSession - Function to pause the session.
+ * @param {function} updateUIState - Function to update UI state.
+ * @param {function} startCountdown - Function to start countdown timer.
+ * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
+ * @param {function} updateResumeButtonToPause - Function to update resume button to pause state.
+ * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
+ * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
+ */
+function togglePauseResume(
+  totalSeconds, 
+  onEnd, 
+  saveSession,
+  pauseSession,
+  updateUIState, 
+  startCountdown,
+  updateInputsFromSeconds, 
+  updatePauseButtonToResume,
+  updateResumeButtonToPause,
+  controller, 
+  timer
+) {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession || {};
 
     if (session.status === "running") {
-      pauseSession(session, totalSeconds, updateUIState, controller, timer);
+      pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, controller, timer);
     } else if (session.status === "paused") {
       const remaining = session.remainingTime;
 
@@ -103,15 +183,35 @@ function togglePauseResume(totalSeconds, onEnd, updateUIState, updateInputsFromS
   });
 }
 
-function handleStop(session, totalSeconds, updateUIState, controller, timer) {
+
+/**
+ * @param {Object} session - The current focus session object.
+ * @param {number} totalSeconds - Total time in seconds remaining.
+ * @param {function} pauseSession - Function to pause the session.
+ * @param {function} updateUIState - Function to update UI state.
+ * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
+ * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
+ * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
+ */
+
+function handleStop(
+  session,
+  totalSeconds, 
+  saveSession,
+  pauseSession,
+  updateUIState,
+  updatePauseButtonToResume, 
+  controller, 
+  timer
+){
   if (session.status === "running") {
-    pauseSession(session, totalSeconds, updateUIState, controller, timer);
+    pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, controller, timer);
     if (controller.stopBtn) controller.stopBtn.disabled = true; // Disable STOP during impulse break
     updateUIState("paused", controller, timer);
   }
 
   chrome.tabs.query({}, (tabs) => {
-    const visionboardUrl = chrome.runtime.getURL("visionboard/visionboard.html");
+    const visionboardUrl = chrome.runtime.getURL("src/visionboard/visionboard.html");
     const existing = tabs.find(
       (t) => t.url && t.url.startsWith(visionboardUrl)
     );
@@ -128,6 +228,7 @@ export {
   handleStop,
   getTimeLeft,
   saveSession,
+  pauseSession,
   checkSession,
   startCountdown,
   createNewSession,

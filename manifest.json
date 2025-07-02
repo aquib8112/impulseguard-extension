@@ -35,7 +35,7 @@
       "resources": 
       ["resources/icons/default_icon.png"
 ,      "blocked/blocked.html",
-      "visionboard/visionboard.html"],
+      "src/visionboard/visionboard.html"],
       "matches": ["<all_urls>"]
     }
   ],

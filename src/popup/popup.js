@@ -5,6 +5,8 @@ import {
   startCountdown,
   createNewSession,
   togglePauseResume,
+  getTimeLeft,
+  pauseSession,
 } from './session.js';
 
 import { 
@@ -13,7 +15,9 @@ import {
   getTotalSeconds,
   showFloatingWarning,
   setupInputValidation,
-  updateInputsFromSeconds
+  updateInputsFromSeconds,
+  updateResumeButtonToPause,
+  updatePauseButtonToResume, 
 } from './ui.js';
 
 function onEnd(controller, timer) {
@@ -39,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTabList(tabs);
   });
 
-  checkSession(onEnd, updateUIState, updateInputsFromSeconds, controller, timer);
+  checkSession(onEnd, getTimeLeft, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, controller, timer);
 
   startBtn.addEventListener("click", () => {
     const totalSeconds = getTotalSeconds(hrInput, minInput, secInput);
@@ -62,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   pauseBtn.addEventListener("click", () => {
     
     const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
-    togglePauseResume(totalSeconds, onEnd, updateUIState, updateInputsFromSeconds, controller, timer);
+    togglePauseResume(totalSeconds, onEnd, saveSession, pauseSession, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, updateResumeButtonToPause, controller, timer);
 
   });
 
@@ -71,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const session = data.focusSession || {};
       const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
-      handleStop(session, totalSeconds, updateUIState, controller, timer);
+      handleStop(session, totalSeconds, saveSession,  pauseSession, updateUIState, updatePauseButtonToResume, controller, timer);
 
     });
   });

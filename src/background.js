@@ -10,7 +10,7 @@ function isUrlWhitelisted(url, whitelist) {
   try {
     const parsedUrl = new URL(url);
 
-    if (parsedUrl.protocol === "chrome-extension:" && parsedUrl.pathname === "/visionboard/visionboard.html") {
+    if (parsedUrl.protocol === "chrome-extension:" && parsedUrl.pathname === "/src/visionboard/visionboard.html") {
       return true;
     }
 
@@ -34,7 +34,7 @@ async function checkTab(tabId, changeInfo, tab) {
     if (!tab.url) return;
     const parsed = new URL(tab.url);
 
-    if (parsed.protocol === "chrome-extension:" && parsed.pathname === "/visionboard/visionboard.html") {
+    if (parsed.protocol === "chrome-extension:" && parsed.pathname === "/src/visionboard/visionboard.html") {
       return;
     }
 
@@ -63,7 +63,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   if (!url || url.startsWith(blockedPageUrl) || url.startsWith("chrome-extension://")) {
     try {
       const parsed = new URL(url);
-      if (parsed.pathname === "/visionboard/visionboard.html") return; 
+      if (parsed.pathname === "/src/visionboard/visionboard.html") return; 
     } catch (e) {
       return;
     }
