@@ -42,7 +42,7 @@ function startCountdown(
   let remaining = totalSeconds;
 
   interval = setInterval(() => {
-    remaining--;
+    updateInputsFromSeconds(remaining, timer.hrInput, timer.minInput, timer.secInput);
 
     if (remaining <= 0) {
       clearInterval(interval);
@@ -51,7 +51,7 @@ function startCountdown(
       return;
     }
 
-    updateInputsFromSeconds(remaining, timer.hrInput, timer.minInput, timer.secInput); // Handle UI updates every second
+    remaining--;
   }, 1000);
 }
 
