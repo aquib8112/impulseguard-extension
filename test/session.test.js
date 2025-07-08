@@ -109,7 +109,8 @@ describe('startCountdown', () => {
     expect(updateMock).toHaveBeenCalledTimes(1);
 
     jest.advanceTimersByTime(2000); // Total 3 seconds
-    expect(updateMock).toHaveBeenCalledTimes(2);
+    jest.runOnlyPendingTimers();
+    expect(updateMock).toHaveBeenCalledTimes(4);
     expect(onEndMock).toHaveBeenCalledWith(controllerMock, timerMock);
     expect(chrome.storage.local.clear).toHaveBeenCalled();
   });
