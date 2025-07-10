@@ -1,9 +1,9 @@
 chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.local.clear();
+  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.clear();
+  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
 });
 
 function isUrlWhitelisted(url, whitelist) {
@@ -86,4 +86,10 @@ chrome.tabs.onUpdated.addListener(checkTab);
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await chrome.tabs.get(activeInfo.tabId);
   checkTab(tab.id, null, tab);
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "open-extension-settings") {
+    chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
+  }
 });

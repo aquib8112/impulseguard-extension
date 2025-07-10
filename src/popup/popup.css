@@ -36,17 +36,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 1rem;
   position: relative;
 }
 
+.header-icon {
+  font-size: 1.25rem;
+  position: relative; /* anchor the dot here */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .pulse-dot {
   position: absolute;
-  top: 2px;
-  right: 120px;
+  top: 4px; /* adjust to sit near the top-right */
+  right: 6px;
   width: 6px;
   height: 6px;
   background-color: #3b82f6;
@@ -55,18 +63,30 @@ body {
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-    }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.settings-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  filter: brightness(1.2) contrast(1.2);
+  transition: transform 0.2s ease;
+  z-index: 1000;
+}
+
+.settings-icon:hover {
+  transform: scale(1.25);
 }
 
 .section-label {

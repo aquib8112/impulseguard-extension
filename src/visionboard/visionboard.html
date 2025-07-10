@@ -7,25 +7,30 @@
   <link rel="stylesheet" href="visionboard.css" />
 </head>
 <body>
-  <svg class="timer" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="10" fill="none" />
-    <circle
-      id="progress"
-      cx="50"
-      cy="50"
-      r="40"
-      stroke="#3b82f6"
-      stroke-width="10"
-      fill="none"
-      class="circle"
-      stroke-linecap="round"
-    />
-    <text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" id="timer-text">90</text>
-  </svg>
+  <!-- Timer & Stop button wrapped inside a container -->
+  <div id="timer-container">
+    <svg class="timer" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="10" fill="none" />
+      <circle
+        id="progress"
+        cx="50"
+        cy="50"
+        r="40"
+        stroke="#3b82f6"
+        stroke-width="10"
+        fill="none"
+        class="circle"
+        stroke-linecap="round"
+      />
+      <text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" id="timer-text">90</text>
+    </svg>
 
-  <img src="/resources/images/image.png" alt="Vision Goal" class="vision-image" />
+    <button class="stop-button" id="stop-button" disabled>STOP</button>
+  </div>
 
-  <button class="stop-button" id="stop-button" disabled>STOP</button>
+  <!-- Vision board image -->
+  <img src="" alt="Vision Goal" class="vision-image" />
+
 
   <script src="visionboard.js"></script>
 </body>

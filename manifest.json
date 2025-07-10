@@ -3,6 +3,7 @@
   "name": "ImpulseGuard",
   "version": "1.0",
   "description": "Restrict distracting tabs and enforce focus sessions.",
+  "options_page": "src/settings/settings.html",
   "permissions": [
     "tabs",
     "storage",
@@ -32,10 +33,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": 
-      ["resources/icons/default_icon.png"
-,      "blocked/blocked.html",
-      "src/visionboard/visionboard.html"],
+      "resources": [
+        "blocked/blocked.html",
+        "src/settings/settings.html",
+        "resources/icons/default_icon.png",
+        "src/visionboard/visionboard.html"
+      ],
       "matches": ["<all_urls>"]
     }
   ],

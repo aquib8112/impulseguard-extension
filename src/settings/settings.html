@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImpulseGuard Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="settings.css" rel="stylesheet">
+  <style></style>
+</head>
+<body>
+  <div class="header">
+    <span class="header-icon">
+      🧠
+      <span class="pulse-dot"></span>
+    </span>
+    <div class="header-title">ImpulseGuard</div>
+  </div>
+  <div class="header-subtitle">Stay focused and achieve your goals</div>
+
+  <div class="card">
+    <div class="card-title">
+      <img class="card-icon" src="../../resources/icons/star_icon.png" alt="View Icon">
+      View Vision Board
+    </div>
+    <button class="card-button View" id="viewVisionBtn">View</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <img class="card-icon" src="../../resources/icons/sheild_icon.png" alt="Incognito Icon">
+      Enable Incognito Blocking
+    </div>
+    <button id="incognitoGuideBtn" class="card-button Enable">Enable</button>
+  </div>
+
+  <div class="card" style="flex-direction: column; align-items: flex-start;">
+    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+      <div class="card-title">
+        <img class="card-icon" src="../../resources/icons/picture_icon.png" alt="Upload Icon">
+        Upload Vision Board
+      </div>
+      <button class="card-button Upload" id="uploadTrigger">Upload</button>
+      <input type="file" id="visionInput" accept="image/*" style="display: none;" />
+    </div>
+    <div class="drop-zone">
+      <img class="drop-zone-icon" src="../../resources/icons/upload_icon.png" alt="Upload Icon">
+      Drop your vision board here or click to browse
+    </div>
+    <div class="feedback error" id="uploadError" style="display: none">
+      <img src="../../resources/icons/exclamation_icon.png" alt="Error Icon">
+      File must be less than 5MB
+    </div>
+    <div class="feedback success" id="uploadSuccess" style="display: none">
+      <img src="../../resources/icons/check_icon.png" alt="Check Icon">
+      Vision board uploaded successfully!
+    </div>
+  </div>
+
+  <!-- Modal for incognito instructions -->
+  <div id="incognitoModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-scrollable">
+        <img src="../../resources/images/incognito_instruction.png" alt="Instructions" class="instruction-image" />
+
+        <div class="modal-buttons">
+          <button id="openExtSettings">Open Extension Settings</button>
+          <button id="cancelGuide">Cancel</button>
+        </div>
+
+        <div class="modal-note">
+          Note: We don’t collect your incognito history. Our only function is to prevent access during sessions.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
