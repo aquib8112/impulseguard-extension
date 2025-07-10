@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pauseBtn = document.getElementById("pauseBtn");
   const stopBtn = document.getElementById("stopBtn");
   const sessionControls = document.getElementById("sessionControls");
+  const openSettingsBtn = document.getElementById("openSettingsBtn");
 
   const controller = {startBtn, stopBtn, pauseBtn, sessionControls};
   const timer = {hrInput, minInput,secInput};
@@ -78,6 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
       handleStop(session, totalSeconds, saveSession,  pauseSession, updateUIState, updatePauseButtonToResume, controller, timer);
 
     });
+  });
+
+  openSettingsBtn?.addEventListener("click", () => {
+    chrome.runtime.openOptionsPage();
   });
 
 });
