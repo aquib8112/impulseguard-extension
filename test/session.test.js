@@ -120,32 +120,32 @@ describe("pauseSession", () => {
   let session;
   let controller;
   let timer;
-  let saveSessionMock, updateUIStateMock, updatePauseButtonToResumeMock;
+  let saveSessionMock, updateUIStateMock, updatePauseButtonToResumeMock, clearFocusSessionAlarmAndBadgeMock;
 
   beforeEach(() => {
-  jest.useFakeTimers();
-  global.interval = setInterval(() => {}, 1000);
+    jest.useFakeTimers();
+    global.interval = setInterval(() => {}, 1000);
 
-  jest.spyOn(global, 'clearInterval'); // <-- Add this
+    jest.spyOn(global, 'clearInterval');
 
-  session = {
-    status: "running",
-    endTime: Date.now() + 5000
-  };
+    session = {
+      status: "running",
+      endTime: Date.now() + 5000
+    };
 
-  controller = { pauseBtn: {} };
-  timer = { hrInput: {}, minInput: {}, secInput: {} };
+    controller = { pauseBtn: {} };
+    timer = { hrInput: {}, minInput: {}, secInput: {} };
 
-  saveSessionMock = jest.fn();
-  updateUIStateMock = jest.fn();
-  updatePauseButtonToResumeMock = jest.fn();
-});
+    saveSessionMock = jest.fn();
+    updateUIStateMock = jest.fn();
+    updatePauseButtonToResumeMock = jest.fn();
+    clearFocusSessionAlarmAndBadgeMock = jest.fn(); // ← Added mock
+  });
 
-afterEach(() => {
-  jest.clearAllTimers();
-  jest.restoreAllMocks(); // <-- Add this
-});
-
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.restoreAllMocks();
+  });
 
   it("pauses the session and updates state/UI/storage", () => {
     pauseSession(
@@ -154,6 +154,7 @@ afterEach(() => {
       saveSessionMock,
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ← Passed here
       controller,
       timer
     );
@@ -167,6 +168,7 @@ afterEach(() => {
     expect(updatePauseButtonToResumeMock).toHaveBeenCalledWith(controller.pauseBtn);
     expect(updateUIStateMock).toHaveBeenCalledWith("paused", controller, timer);
     expect(saveSessionMock).toHaveBeenCalledWith(session);
+    expect(clearFocusSessionAlarmAndBadgeMock).toHaveBeenCalled(); // ← New assertion
 
     // Check timer cleared
     expect(clearInterval).toHaveBeenCalled();
@@ -174,7 +176,14 @@ afterEach(() => {
 });
 
 describe("checkSession", () => {
-  let onEndMock, getTimeLeftMock, updateUIStateMock, startCountdownMock, updateInputsFromSecondsMock, updatePauseButtonToResumeMock;
+  let onEndMock,
+  getTimeLeftMock,
+  updateUIStateMock,
+  startCountdownMock,
+  updateInputsFromSecondsMock,
+  updatePauseButtonToResumeMock,
+  clearFocusSessionAlarmAndBadgeMock;
+
   let controller, timer;
 
   beforeEach(() => {
@@ -184,16 +193,17 @@ describe("checkSession", () => {
     startCountdownMock = jest.fn();
     updateInputsFromSecondsMock = jest.fn();
     updatePauseButtonToResumeMock = jest.fn();
+    clearFocusSessionAlarmAndBadgeMock = jest.fn(); // ✅
 
     controller = { pauseBtn: {} };
-    timer = { hrInput: {}, minInput: {}, secInput: {} };
-    
+    timer = { hrInput: {}, minInput: {}, secInput: {} }; // ✅ Ensure defined in all tests
+
     global.chrome = {
       storage: {
         local: {
-          get: jest.fn()
-        },
-        localStorage: {} // optional fallback
+          get: jest.fn(),
+          clear: jest.fn()
+        }
       }
     };
   });
@@ -215,6 +225,7 @@ describe("checkSession", () => {
       startCountdownMock,
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅
       controller,
       timer
     );
@@ -243,6 +254,7 @@ describe("checkSession", () => {
       startCountdownMock,
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅
       controller,
       timer
     );
@@ -264,7 +276,6 @@ describe("checkSession", () => {
     });
 
     getTimeLeftMock.mockReturnValue(0);
-    chrome.storage.local.clear = jest.fn();
 
     checkSession(
       onEndMock,
@@ -273,6 +284,7 @@ describe("checkSession", () => {
       startCountdownMock,
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅
       controller,
       timer
     );
@@ -286,6 +298,7 @@ describe("togglePauseResume", () => {
   let onEndMock, saveSessionMock, pauseSessionMock, updateUIStateMock;
   let startCountdownMock, updateInputsFromSecondsMock;
   let updatePauseButtonToResumeMock, updateResumeButtonToPauseMock;
+  let scheduleFocusSessionAlarmMock, clearFocusSessionAlarmAndBadgeMock;
   let controller, timer;
 
   beforeEach(() => {
@@ -297,6 +310,8 @@ describe("togglePauseResume", () => {
     updateInputsFromSecondsMock = jest.fn();
     updatePauseButtonToResumeMock = jest.fn();
     updateResumeButtonToPauseMock = jest.fn();
+    scheduleFocusSessionAlarmMock = jest.fn();
+    clearFocusSessionAlarmAndBadgeMock = jest.fn();
 
     controller = { pauseBtn: {} };
     timer = { hrInput: {}, minInput: {}, secInput: {} };
@@ -325,7 +340,7 @@ describe("togglePauseResume", () => {
     });
 
     togglePauseResume(
-      120, // totalSeconds
+      120,
       onEndMock,
       saveSessionMock,
       pauseSessionMock,
@@ -334,6 +349,8 @@ describe("togglePauseResume", () => {
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
       updateResumeButtonToPauseMock,
+      scheduleFocusSessionAlarmMock,
+      clearFocusSessionAlarmAndBadgeMock,
       controller,
       timer
     );
@@ -344,6 +361,7 @@ describe("togglePauseResume", () => {
       saveSessionMock,
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock,
       controller,
       timer
     );
@@ -356,7 +374,7 @@ describe("togglePauseResume", () => {
       cb({ focusSession: session });
     });
 
-    chrome.tabs.query.mockImplementation((_, cb) => cb([])); // no visionboard open
+    chrome.tabs.query.mockImplementation((_, cb) => cb([]));
 
     togglePauseResume(
       120,
@@ -368,6 +386,8 @@ describe("togglePauseResume", () => {
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
       updateResumeButtonToPauseMock,
+      scheduleFocusSessionAlarmMock,
+      clearFocusSessionAlarmAndBadgeMock,
       controller,
       timer
     );
@@ -380,6 +400,7 @@ describe("togglePauseResume", () => {
     expect(startCountdownMock).toHaveBeenCalledWith(90, onEndMock, updateInputsFromSecondsMock, controller, timer);
     expect(updateUIStateMock).toHaveBeenCalledWith("running", controller, timer);
     expect(saveSessionMock).toHaveBeenCalledWith(session);
+    expect(scheduleFocusSessionAlarmMock).toHaveBeenCalledWith(90);
   });
 
   it("removes visionboard tab if open", () => {
@@ -402,6 +423,8 @@ describe("togglePauseResume", () => {
       updateInputsFromSecondsMock,
       updatePauseButtonToResumeMock,
       updateResumeButtonToPauseMock,
+      scheduleFocusSessionAlarmMock,
+      clearFocusSessionAlarmAndBadgeMock,
       controller,
       timer
     );
@@ -411,7 +434,7 @@ describe("togglePauseResume", () => {
 });
 
 describe("handleStop", () => {
-  let pauseSessionMock, updateUIStateMock, updatePauseButtonToResumeMock;
+  let pauseSessionMock, updateUIStateMock, updatePauseButtonToResumeMock, clearFocusSessionAlarmAndBadgeMock;
   let session, controller, timer;
   let chromeTabsQueryMock, chromeTabsUpdateMock, chromeTabsCreateMock;
 
@@ -419,6 +442,7 @@ describe("handleStop", () => {
     pauseSessionMock = jest.fn();
     updateUIStateMock = jest.fn();
     updatePauseButtonToResumeMock = jest.fn();
+    clearFocusSessionAlarmAndBadgeMock = jest.fn(); // ✅ Added
 
     session = { status: "running" };
     controller = { stopBtn: { disabled: false }, pauseBtn: {} };
@@ -450,6 +474,7 @@ describe("handleStop", () => {
       pauseSessionMock,
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅ Added
       controller,
       timer
     );
@@ -460,6 +485,7 @@ describe("handleStop", () => {
       expect.any(Function),
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅ Added
       controller,
       timer
     );
@@ -469,7 +495,7 @@ describe("handleStop", () => {
   });
 
   it("opens a new visionboard tab if none exists", () => {
-    chromeTabsQueryMock.mockImplementation((_, cb) => cb([])); // No matching tab
+    chromeTabsQueryMock.mockImplementation((_, cb) => cb([]));
 
     handleStop(
       session,
@@ -478,6 +504,7 @@ describe("handleStop", () => {
       pauseSessionMock,
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅ Added
       controller,
       timer
     );
@@ -499,6 +526,7 @@ describe("handleStop", () => {
       pauseSessionMock,
       updateUIStateMock,
       updatePauseButtonToResumeMock,
+      clearFocusSessionAlarmAndBadgeMock, // ✅ Added
       controller,
       timer
     );

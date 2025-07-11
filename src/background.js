@@ -1,11 +1,3 @@
-chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
-});
-
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
-});
-
 function isUrlWhitelisted(url, whitelist) {
   try {
     const parsedUrl = new URL(url);
@@ -49,6 +41,14 @@ async function checkTab(tabId, changeInfo, tab) {
   }
 }
 
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"]);
+});
+
 chrome.tabs.onCreated.addListener(async (tab) => {
   const data = await chrome.storage.local.get("focusSession");
   const session = data.focusSession;
@@ -83,6 +83,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
 });
 
 chrome.tabs.onUpdated.addListener(checkTab);
+
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await chrome.tabs.get(activeInfo.tabId);
   checkTab(tab.id, null, tab);
@@ -91,5 +92,14 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "open-extension-settings") {
     chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
+  }
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "focusSessionEnd") {
+    chrome.storage.local.clear(() => {
+      chrome.action.setBadgeText({ text: "Done" });
+      chrome.action.setBadgeBackgroundColor({ color: "#10b981" }); // green
+    });
   }
 });
