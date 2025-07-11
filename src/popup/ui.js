@@ -63,6 +63,19 @@ function showFloatingWarning(message = "Please select at least one tab before st
   document.addEventListener("keydown", removeWarning, true);
 }
 
+function scheduleFocusSessionAlarm(totalSeconds) {
+  chrome.alarms.clear("focusSessionEnd", () => {
+    chrome.alarms.create("focusSessionEnd", {
+      when: Date.now() + totalSeconds * 1000,
+    });
+  });
+}
+
+function clearFocusSessionAlarmAndBadge() {
+  chrome.alarms.clear("focusSessionEnd");
+  chrome.action.setBadgeText({ text: "" });
+}
+
 function setupInputValidation(hrInput, minInput, secInput) {
   if (!hrInput || !minInput || !secInput) return;
 
@@ -162,4 +175,6 @@ export {
   updateInputsFromSeconds,
   updatePauseButtonToResume,
   updateResumeButtonToPause,
+  scheduleFocusSessionAlarm,
+  clearFocusSessionAlarmAndBadge,
 };

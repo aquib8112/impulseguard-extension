@@ -61,6 +61,7 @@ function startCountdown(
  * @param {function} saveSession - Function to persist session to storage.
  * @param {function} updateUIState - Function to update UI state.
  * @param {function} updatePauseButtonToResume - Function to update pause button to resume state.
+ * @param {function} clearFocusSessionAlarmAndBadge - Function to clear focus session alarm and badge.
  * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
  * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
  */
@@ -70,6 +71,7 @@ function pauseSession(
   saveSession,
   updateUIState,
   updatePauseButtonToResume,
+  clearFocusSessionAlarmAndBadge,
   controller, 
   timer
 ) {
@@ -83,6 +85,7 @@ function pauseSession(
   updateUIState("paused", controller, timer);
 
   saveSession(session);
+  clearFocusSessionAlarmAndBadge();
 }
 
 /**
@@ -92,6 +95,7 @@ function pauseSession(
  * @param {function} startCountdown - Function to start countdown timer.
  * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
  * @param {function} updatePauseButtonToResume - Function to update pause button to resume state.
+ * @param {function} clearFocusSessionAlarmAndBadge - Function to clear focus session alarm and badge.
  * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
  * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
  */
@@ -102,12 +106,16 @@ function checkSession(
   startCountdown,
   updateInputsFromSeconds,
   updatePauseButtonToResume,
+  clearFocusSessionAlarmAndBadge,
   controller, 
   timer
 ) {
   chrome.storage.local.get("focusSession", (data) => {
     const session = data.focusSession;
-    if (!session || session.status === "idle") return;
+    if (!session || session.status === "idle") {
+      clearFocusSessionAlarmAndBadge();
+      return;
+    }
 
     if (session.status === "paused" && session.remainingTime) {
       updateInputsFromSeconds(session.remainingTime, timer.hrInput, timer.minInput, timer.secInput);
@@ -139,6 +147,8 @@ function checkSession(
  * @param {function} startCountdown - Function to start countdown timer.
  * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
  * @param {function} updateResumeButtonToPause - Function to update resume button to pause state.
+ * @param {function} scheduleFocusSessionAlarm - Function to schedule focus session alarm.
+ * @param {function} clearFocusSessionAlarmAndBadge - Function to clear focus session alarm and badge.
  * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
  * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
  */
@@ -152,6 +162,8 @@ function togglePauseResume(
   updateInputsFromSeconds, 
   updatePauseButtonToResume,
   updateResumeButtonToPause,
+  scheduleFocusSessionAlarm,
+  clearFocusSessionAlarmAndBadge,
   controller, 
   timer
 ) {
@@ -159,7 +171,7 @@ function togglePauseResume(
     const session = data.focusSession || {};
 
     if (session.status === "running") {
-      pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, controller, timer);
+      pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, clearFocusSessionAlarmAndBadge, controller, timer);
     } else if (session.status === "paused") {
       const remaining = session.remainingTime;
 
@@ -173,6 +185,7 @@ function togglePauseResume(
       updateUIState("running", controller, timer);
 
       saveSession(session);
+      scheduleFocusSessionAlarm(remaining);
 
       // Optional: Close visionboard if open
       chrome.tabs.query({}, (tabs) => {
@@ -190,6 +203,7 @@ function togglePauseResume(
  * @param {function} pauseSession - Function to pause the session.
  * @param {function} updateUIState - Function to update UI state.
  * @param {function} updateInputsFromSeconds - Function to sync timer inputs from seconds.
+ * @param {function} clearFocusSessionAlarmAndBadge - Function to clear focus session alarm and badge.
  * @param {Object} controller - UI controller elements (startBtn, stopBtn, pauseBtn, sessionControls).
  * @param {Object} timer - Timer inputs (hrInput, minInput, secInput).
  */
@@ -201,11 +215,12 @@ function handleStop(
   pauseSession,
   updateUIState,
   updatePauseButtonToResume, 
+  clearFocusSessionAlarmAndBadge,
   controller, 
   timer
 ){
   if (session.status === "running") {
-    pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, controller, timer);
+    pauseSession(session, totalSeconds, saveSession, updateUIState, updatePauseButtonToResume, clearFocusSessionAlarmAndBadge, controller, timer);
     if (controller.stopBtn) controller.stopBtn.disabled = true; // Disable STOP during impulse break
     updateUIState("paused", controller, timer);
   }

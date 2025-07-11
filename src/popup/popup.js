@@ -17,7 +17,9 @@ import {
   setupInputValidation,
   updateInputsFromSeconds,
   updateResumeButtonToPause,
-  updatePauseButtonToResume, 
+  updatePauseButtonToResume,
+  scheduleFocusSessionAlarm,
+  clearFocusSessionAlarmAndBadge
 } from './ui.js';
 
 function onEnd(controller, timer) {
@@ -44,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTabList(tabs);
   });
 
-  checkSession(onEnd, getTimeLeft, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, controller, timer);
+  checkSession(onEnd, getTimeLeft, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, clearFocusSessionAlarmAndBadge, controller, timer);
 
   startBtn.addEventListener("click", () => {
     const totalSeconds = getTotalSeconds(hrInput, minInput, secInput);
@@ -60,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const session = createNewSession(totalSeconds, whitelist);
 
     saveSession(session);
+    scheduleFocusSessionAlarm(totalSeconds);
+
     startCountdown(totalSeconds, onEnd, updateInputsFromSeconds, controller, timer);
     updateUIState("running",controller, timer);
   });
@@ -67,7 +71,21 @@ document.addEventListener("DOMContentLoaded", () => {
   pauseBtn.addEventListener("click", () => {
     
     const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
-    togglePauseResume(totalSeconds, onEnd, saveSession, pauseSession, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, updateResumeButtonToPause, controller, timer);
+    togglePauseResume(
+      totalSeconds, 
+      onEnd, 
+      saveSession, 
+      pauseSession, 
+      updateUIState, 
+      startCountdown, 
+      updateInputsFromSeconds, 
+      updatePauseButtonToResume, 
+      updateResumeButtonToPause, 
+      scheduleFocusSessionAlarm,
+      clearFocusSessionAlarmAndBadge, 
+      controller, 
+      timer
+    );
 
   });
 
@@ -76,7 +94,17 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const session = data.focusSession || {};
       const totalSeconds = getTotalSeconds(hrInput,minInput,secInput);
-      handleStop(session, totalSeconds, saveSession,  pauseSession, updateUIState, updatePauseButtonToResume, controller, timer);
+      handleStop(
+        session, 
+        totalSeconds, 
+        saveSession,  
+        pauseSession, 
+        updateUIState, 
+        updatePauseButtonToResume, 
+        clearFocusSessionAlarmAndBadge, 
+        controller, 
+        timer
+      );
 
     });
   });
