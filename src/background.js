@@ -22,6 +22,7 @@ async function checkTab(tabId, changeInfo, tab) {
   }
 
   const blockedPageUrl = chrome.runtime.getURL("src/blocked.html");
+
   try {
     if (!tab.url) return;
     const parsed = new URL(tab.url);
@@ -33,11 +34,19 @@ async function checkTab(tabId, changeInfo, tab) {
     if (tab.url.startsWith(blockedPageUrl)) return;
 
     if (!isUrlWhitelisted(tab.url, session.whitelist)) {
-      chrome.tabs.update(tab.id, { url: blockedPageUrl });
+      try {
+        await chrome.tabs.update(tab.id, { url: blockedPageUrl });
+      } catch (err) {
+        console.warn(`Failed to update tab ${tab.id}. It may have been closed.`, err);
+      }
     }
   } catch (err) {
-    console.warn("Invalid URL in checkTab:", tab.url);
-    chrome.tabs.update(tab.id, { url: blockedPageUrl });
+    console.warn("Invalid URL in checkTab:", tab.url, err);
+    try {
+      await chrome.tabs.update(tab.id, { url: blockedPageUrl });
+    } catch (e) {
+      console.warn(`Failed to update invalid tab ${tab.id}.`, e);
+    }
   }
 }
 
@@ -85,9 +94,16 @@ chrome.tabs.onCreated.addListener(async (tab) => {
 chrome.tabs.onUpdated.addListener(checkTab);
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const tab = await chrome.tabs.get(activeInfo.tabId);
-  checkTab(tab.id, null, tab);
+  try {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    if (tab && tab.id) {
+      await checkTab(tab.id, null, tab);
+    }
+  } catch (err) {
+    console.warn(`Tab with id ${activeInfo.tabId} no longer exists.`, err);
+  }
 });
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "open-extension-settings") {
