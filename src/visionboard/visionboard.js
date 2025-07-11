@@ -44,6 +44,6 @@ chrome.storage.local.get("visionImage", (data) => {
   if (data.visionImage && img) {
     img.src = data.visionImage;
   } else {
-    img.src = "/resources/images/image.png"; // fallback
+    img.src = "/resources/images/default_visionboard.jpg"; // fallback
   }
 });
