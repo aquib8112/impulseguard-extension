@@ -21,7 +21,7 @@ async function checkTab(tabId, changeInfo, tab) {
     return;
   }
 
-  const blockedPageUrl = chrome.runtime.getURL("src/blocked.html");
+  const blockedPageUrl = chrome.runtime.getURL("src/blocked/blocked.html");
 
   try {
     if (!tab.url) return;
@@ -66,7 +66,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
     return;
   }
 
-  const blockedPageUrl = chrome.runtime.getURL("src/blocked.html");
+  const blockedPageUrl = chrome.runtime.getURL("src/blocked/blocked.html");
   const url = tab.pendingUrl || tab.url || "";
 
   if (!url || url.startsWith(blockedPageUrl) || url.startsWith("chrome-extension://")) {
