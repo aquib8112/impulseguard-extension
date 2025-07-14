@@ -74,21 +74,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.style.borderColor = '#3b82f6';
-        dropZone.style.backgroundColor = '#1e293b88';
+        dropZone.classList.add('active');
     });
 
     dropZone.addEventListener('dragleave', () => {
-        dropZone.style.borderColor = '#475569';
-        dropZone.style.backgroundColor = '#1e293b';
+        dropZone.classList.remove('active');
     });
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.style.borderColor = '#475569';
-        dropZone.style.backgroundColor = '#1e293b';
+        dropZone.classList.remove('active');
         handleVisionUpload(e.dataTransfer.files[0]);
     });
+
 
     modalOverlay?.addEventListener("click", (e) => {
         if (!modalContent.contains(e.target)) {
