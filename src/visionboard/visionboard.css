@@ -1,16 +1,34 @@
-body {
+html, body {
   margin: 0;
-  background-color: #111827;
-  color: white;
-  font-family: sans-serif;
-  height: 100vh;
+  padding: 0;
+  height: 100%;
+  background-color: black;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
+/* Gradient background layer */
+.background-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom right, rgba(17, 24, 39, 0.1), black);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Vision image centered and above background */
+.vision-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  z-index: 1;
+}
+
+/* Timer and stop button stay above vision image */
 .timer {
   position: absolute;
   top: 20px;
@@ -21,24 +39,34 @@ body {
 }
 
 .circle {
+  stroke: url(#glossyGradient);
   stroke-dasharray: 251.2;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.1));
 }
 
 .stop-button {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background-color: #dc2626;
-  color: white;
-  padding: 12px 20px;
-  font-weight: bold;
-  font-size: 14px;
+  padding: 0.25rem 2.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  z-index: 2;
+  backdrop-filter: blur(6px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  height: 2.5rem;
+  background: linear-gradient(to bottom right, #f87171, #dc2626);
+}
+
+.stop-button:hover {
+  transform: translateY(-2px);
 }
 
 .stop-button:disabled {
@@ -46,15 +74,3 @@ body {
   cursor: not-allowed;
 }
 
-.vision-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  z-index: 1;
-}
