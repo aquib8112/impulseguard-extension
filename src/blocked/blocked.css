@@ -1,64 +1,64 @@
 html,
 body {
-margin: 0;
-padding: 0;
-height: 100%;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-background-color: black;
-overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background-color: black;
+    overflow: hidden;
 }
 
 .background-gradient {
-position: absolute;
-inset: 0;
-background: linear-gradient(to bottom right, rgba(17, 24, 39, 0.1), black);
-pointer-events: none;
-z-index: 0;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, rgba(17, 24, 39, 0.1), black);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .content {
-position: relative;
-z-index: 1;
-height: 100%;
-display: flex;
-justify-content: center;
-align-items: flex-start;
-text-align: center;
-padding: 4rem 2rem 2rem 2rem;
-animation: fade-in 1.2s ease-out forwards;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    padding: 4rem 2rem 2rem 2rem;
+    animation: fade-in 1.2s ease-out forwards;
 }
 
 h1 {
-font-weight: 300;
-font-size: 3rem;
-line-height: 1.4;
-margin-bottom: 1.5rem;
-background: linear-gradient(to bottom, #9b9c9d, #666667);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+    font-weight: 300;
+    font-size: 3rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to bottom, #9b9c9d, #666667);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 h1 span {
-font-size: 90%;
-display: block;
-background: linear-gradient(to bottom, #6f7175, #515255);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+    font-size: 90%;
+    display: block;
+    background: linear-gradient(to bottom, #6f7175, #515255);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .divider {
-width: 6rem;
-height: 2px;
-background: linear-gradient(to right, transparent, #181819, transparent);
-margin: 0 auto 2rem;
+    width: 6rem;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #181819, transparent);
+    margin: 0 auto 2rem;
 }
 
 .subtext {
-background: linear-gradient(to bottom, #2d3034, #1d1f21);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-font-size: 12rem;
-font-weight: 300;
+    background: linear-gradient(to bottom, #2d3034, #1d1f21);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 12rem;
+    font-weight: 300;
 }
 
 @media (min-width: 768px) {
