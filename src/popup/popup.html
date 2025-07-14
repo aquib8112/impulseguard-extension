@@ -7,59 +7,56 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <img src="../../resources/icons/settings_icon.png" 
-     alt="Settings" 
-     class="settings-icon" 
-     id="openSettingsBtn"
-     title="Settings" />
-
-  <div class="header">
-  <span class="header-icon">
-    🧠
-    <span class="pulse-dot"></span>
-  </span>
-  <span class="header-title">ImpulseGuard</span>
-</div>
-
-  <div class="section-label">Select Duration</div>
-  <div class="time-picker">
-    <div class="time-box">
-      <input type="number" id="hours" value="01" min="0" max="23" maxlength="2">
-      <small>Hours</small>
-    </div>
-    <div class="time-box">
-      <input type="number" id="minutes" value="30" min="0" max="59" maxlength="2">
-      <small>Minutes</small>
-    </div>
-    <div class="time-box">
-      <input type="number" id="seconds" value="00" min="0" max="59" maxlength="2">
-      <small>Seconds</small>
-    </div>
-  </div>
-
-  <div class="section-label">Select Tab</div>
-  <div class="tab-list" id="tab-list"></div>
-
-  <div id="control-buttons">
-    <button id="initialStartBtn" class="btn btn-start">
-      <span class="btn-icon">▶</span>
-      <span>START</span>
-    </button>
-    <div id="sessionControls" style="display: none;">
-      <div class="btn-group" >
-        <button id="pauseBtn" class="btn btn-pause">
-          <span class="btn-icon">⏸</span>
-          <span>PAUSE</span>
-        </button>
-        
-        <button id="stopBtn" class="btn btn-stop">
-          <span class="btn-icon">⏹</span>
-          <span>STOP</span>
-        </button>
-
+  <div class="background-gradient"></div>
+    <div class="header">
+      <div class="settings-icon">
+        <img src="../../resources/icons/settings_icon.png" id = openSettingsBtn alt="Settings" title="Settings" style="width: 60%; height: 60%;" />
+      </div>
+      <div class="logo-container">
+        <div class="header-title">ImpulseGuard</div>
+        <div class="header-icon">
+          🧠
+          <div class="pulse-dot"></div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <div class="time-picker">
+      <div class="time-block">
+        <div class="time-value"><input type="number" id = "hours" value="01" min="0" max="23"></div>
+        <div class="time-label">Hours</div>
+      </div>
+      <div class="colon">:</div>
+      <div class="time-block">
+        <div class="time-value"><input type="number" id = "minutes" value="30" min="0" max="59"></div>
+        <div class="time-label">Minutes</div>
+      </div>
+      <div class="colon">:</div>
+      <div class="time-block">
+        <div class="time-value"><input type="number" id = "seconds" value="00" min="0" max="59"></div>
+        <div class="time-label">Seconds</div>
+      </div>
+    </div>
+
+    <div class="select-tab">Select Tab</div>
+    <div class="tab-list" id="tab-list"></div>
+
+    <div id="control-buttons">
+      <button id="initialStartBtn" class="btn btn-start">
+        <span>START</span>
+      </button>
+      <div id="sessionControls" style="display: none;">
+        <div class="btn-group" >
+          <button id="pauseBtn" class="btn btn-pause">
+            <span>PAUSE</span>
+          </button>
+          <button id="stopBtn" class="btn btn-stop">
+            <span>STOP</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
 
 
   <div id="floating-warning" class="floating-warning">Please select at least one tab before starting.</div>

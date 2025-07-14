@@ -13,6 +13,7 @@ import {
   updateUIState,
   renderTabList,
   getTotalSeconds,
+  setupScrollBlur,
   showFloatingWarning,
   setupInputValidation,
   updateInputsFromSeconds,
@@ -36,6 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const stopBtn = document.getElementById("stopBtn");
   const sessionControls = document.getElementById("sessionControls");
   const openSettingsBtn = document.getElementById("openSettingsBtn");
+  
+  const tabList = document.querySelector('.tab-list');
+  const triggerMaskUpdate = setupScrollBlur(tabList);
 
   const controller = {startBtn, stopBtn, pauseBtn, sessionControls};
   const timer = {hrInput, minInput,secInput};
@@ -44,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   chrome.tabs.query({}, (tabs) => {
     renderTabList(tabs);
+    triggerMaskUpdate();
   });
 
   checkSession(onEnd, getTimeLeft, updateUIState, startCountdown, updateInputsFromSeconds, updatePauseButtonToResume, clearFocusSessionAlarmAndBadge, controller, timer);

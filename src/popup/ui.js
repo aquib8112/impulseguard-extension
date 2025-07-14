@@ -1,10 +1,10 @@
 function updateResumeButtonToPause(pauseBtn) {
-  pauseBtn.textContent = "⏸ PAUSE";
+  pauseBtn.textContent = "PAUSE";
   pauseBtn.style.backgroundColor = "#facc15";
 }
 
 function updatePauseButtonToResume(pauseBtn) {
-  pauseBtn.textContent = "▶ RESUME";
+  pauseBtn.textContent = "RESUME";
   pauseBtn.style.backgroundColor = "#d1d5db";
 }
 
@@ -163,10 +163,38 @@ function renderTabList(tabs) {
   });
 }
 
+function setupScrollBlur(tabListElement) {
+  const updateMask = () => {
+    const scrollTop = tabListElement.scrollTop;
+    const scrollHeight = tabListElement.scrollHeight;
+    const clientHeight = tabListElement.clientHeight;
+
+    const atTop = scrollTop <= 0;
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+    let mask = 'linear-gradient(to bottom, transparent 0%, white 8%, white 92%, transparent 100%)';
+    if (atTop && atBottom) {
+      mask = 'none';
+    } else if (atTop) {
+      mask = 'linear-gradient(to bottom, white 0%, white 92%, transparent 100%)';
+    } else if (atBottom) {
+      mask = 'linear-gradient(to bottom, transparent 0%, white 8%, white 100%)';
+    }
+
+    tabListElement.style.webkitMaskImage = mask;
+    tabListElement.style.maskImage = mask;
+  };
+
+  tabListElement.addEventListener('scroll', updateMask);
+
+  return updateMask;
+}
+
 export {
   updateUIState,
   renderTabList,
   getTotalSeconds,
+  setupScrollBlur,
   disableTimerInputs,
   showFloatingWarning,
   setupInputValidation,
