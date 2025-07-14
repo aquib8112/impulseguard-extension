@@ -7,26 +7,41 @@
   <link rel="stylesheet" href="visionboard.css" />
 </head>
 <body>
-  <!-- Timer & Stop button wrapped inside a container -->
+  <div class="background-gradient"></div>
   <div id="timer-container">
     <svg class="timer" viewBox="0 0 100 100">
+      <!-- Glossy gradient definition -->
+      <defs>
+        <linearGradient id="glossyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6b7280" /> <!-- slate-500 -->
+          <stop offset="50%" stop-color="#9ca3af" /> <!-- slate-400 -->
+          <stop offset="100%" stop-color="#4b5563" /> <!-- slate-600 -->
+        </linearGradient>
+      </defs>
+
+      <!-- Background track -->
       <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="10" fill="none" />
+
+      <!-- Progress circle using the gradient -->
       <circle
         id="progress"
         cx="50"
         cy="50"
         r="40"
-        stroke="#3b82f6"
+        stroke="url(#glossyGradient)"
         stroke-width="10"
         fill="none"
         class="circle"
         stroke-linecap="round"
       />
+
+      <!-- Timer text -->
       <text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" id="timer-text">90</text>
     </svg>
 
     <button class="stop-button" id="stop-button" disabled>STOP</button>
   </div>
+
 
   <!-- Vision board image -->
   <img src="" alt="Vision Goal" class="vision-image" />
