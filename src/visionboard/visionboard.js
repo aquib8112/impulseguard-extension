@@ -32,9 +32,12 @@ if (source === "settings") {
       const session = data.focusSession;
       if (!session || !session.originalTime) return;
 
-      chrome.storage.local.clear(() => {
-        window.close();
-      });
+      chrome.storage.local.remove(
+        ["focusSession", "sessionStatus", "sessionStartTime"],
+        () => {
+          window.close();
+        }
+      );
     });
   });
 }
