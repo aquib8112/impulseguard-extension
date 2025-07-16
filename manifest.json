@@ -20,17 +20,17 @@
   "action": {
     "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "16": "resources/icons/brain_with_impulse_icon.png",
-      "32": "resources/icons/brain_with_impulse_icon.png",
-      "48": "resources/icons/brain_with_impulse_icon.png",
-      "128": "resources/icons/brain_with_impulse_icon.png"
+      "16": "resources/icons/brain_with_impulse_icon16.png",
+      "32": "resources/icons/brain_with_impulse_icon32.png",
+      "48": "resources/icons/brain_with_impulse_icon48.png",
+      "128": "resources/icons/brain_with_impulse_icon128.png"
     }
   },
   "icons": {
-    "16": "resources/icons/brain_with_impulse_icon.png",
-    "32": "resources/icons/brain_with_impulse_icon.png",
-    "48": "resources/icons/brain_with_impulse_icon.png",
-    "128": "resources/icons/brain_with_impulse_icon.png"
+    "16": "resources/icons/brain_with_impulse_icon16.png",
+    "32": "resources/icons/brain_with_impulse_icon32.png",
+    "48": "resources/icons/brain_with_impulse_icon48.png",
+    "128": "resources/icons/brain_with_impulse_icon128.png"
   },
   "web_accessible_resources": [
     {
