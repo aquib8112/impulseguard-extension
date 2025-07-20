@@ -2,16 +2,13 @@
   "manifest_version": 3,
   "name": "ImpulseGuard",
   "version": "1.0",
-  "description": "Restrict distracting tabs and enforce focus sessions.",
+  "description": "Stops you from opening random sites while working.",
   "options_page": "src/settings/settings.html",
   "permissions": [
     "tabs",
     "storage",
     "activeTab",
     "alarms"
-  ],
-  "host_permissions": [
-    "<all_urls>"
   ],
   "background": {
     "service_worker": "src/background.js"

@@ -17,19 +17,18 @@ async function checkTab(tabId, changeInfo, tab) {
   const data = await chrome.storage.local.get("focusSession");
   const session = data.focusSession;
 
-  if (!session || (session.status !== "running" && session.status !== "paused")) {
-    return;
-  }
+  if (!session || (session.status !== "running" && session.status !== "paused")) return;
 
   const blockedPageUrl = chrome.runtime.getURL("src/blocked/blocked.html");
 
+  if (!tab.url) return;
   try {
-    if (!tab.url) return;
     const parsed = new URL(tab.url);
 
-    if (parsed.protocol === "chrome-extension:" && parsed.pathname === "/src/visionboard/visionboard.html") {
-      return;
-    }
+    if (
+      parsed.protocol === "chrome-extension:" &&
+      (parsed.pathname === "/src/visionboard/visionboard.html" || parsed.pathname === "/src/popup/popup.html")
+    ) return;
 
     if (tab.url.startsWith(blockedPageUrl)) return;
 
@@ -62,26 +61,22 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   const data = await chrome.storage.local.get("focusSession");
   const session = data.focusSession;
 
-  if (!session || (session.status !== "running" && session.status !== "paused")) {
-    return;
-  }
+  if (!session || (session.status !== "running" && session.status !== "paused")) return;
 
   const blockedPageUrl = chrome.runtime.getURL("src/blocked/blocked.html");
   const url = tab.pendingUrl || tab.url || "";
 
-  if (!url || url.startsWith(blockedPageUrl) || url.startsWith("chrome-extension://")) {
-    try {
-      const parsed = new URL(url);
-      if (parsed.pathname === "/src/visionboard/visionboard.html") return; 
-    } catch (e) {
-      return;
-    }
-    return;
-  }
+  if (!url || url.startsWith(blockedPageUrl)) return;
 
   try {
-    const hostname = new URL(url).hostname;
+    const parsed = new URL(url);
 
+    if (
+      parsed.protocol === "chrome-extension:" &&
+      (parsed.pathname === "/src/visionboard/visionboard.html" || parsed.pathname === "/src/popup/popup.html")
+    ) return;
+
+    const hostname = parsed.hostname;
     if (!session.whitelist.includes(hostname)) {
       chrome.tabs.remove(tab.id);
     }
@@ -97,25 +92,46 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
   try {
     const tab = await chrome.tabs.get(activeInfo.tabId);
     if (tab && tab.id) {
-      await checkTab(tab.id, null, tab);
+      try {
+        await checkTab(tab.id, null, tab);
+      } catch (err) {
+        console.warn(`checkTab failed for tab ${tab.id}`, err);
+      }
     }
   } catch (err) {
     console.warn(`Tab with id ${activeInfo.tabId} no longer exists.`, err);
   }
 });
 
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "open-extension-settings") {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "open-extension-settings") {
     chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
+  }
+
+  if (message.type === "scheduleFocusSessionAlarm") {
+    chrome.alarms.clear("focusSessionEnd", () => {
+      chrome.alarms.create("focusSessionEnd", {
+        when: Date.now() + message.totalSeconds * 1000,
+      });
+      console.log("[Alarm Scheduled by Background] Will fire in", message.totalSeconds, "seconds");
+    });
+  }
+
+  if (message.type === "clearFocusSessionAlarmAndBadge") {
+    chrome.alarms.clear("focusSessionEnd");
+    chrome.action.setBadgeText({ text: "" });
+    console.log("[Alarm Cleared by Background]");
   }
 });
 
+
 chrome.alarms.onAlarm.addListener((alarm) => {
+  console.log("[Alarm Triggered]", alarm.name);
   if (alarm.name === "focusSessionEnd") {
-    chrome.storage.local.clear(() => {
+    chrome.storage.local.remove(["focusSession", "sessionStatus", "sessionStartTime"], () => {
       chrome.action.setBadgeText({ text: "Done" });
-      chrome.action.setBadgeBackgroundColor({ color: "#10b981" }); // green
+      chrome.action.setBadgeBackgroundColor({ color: "#10b981" });
     });
   }
 });
+

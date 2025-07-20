@@ -64,16 +64,16 @@ function showFloatingWarning(message = "Please select at least one tab before st
 }
 
 function scheduleFocusSessionAlarm(totalSeconds) {
-  chrome.alarms.clear("focusSessionEnd", () => {
-    chrome.alarms.create("focusSessionEnd", {
-      when: Date.now() + totalSeconds * 1000,
-    });
+  chrome.runtime.sendMessage({
+    type: "scheduleFocusSessionAlarm",
+    totalSeconds: totalSeconds,
   });
 }
 
 function clearFocusSessionAlarmAndBadge() {
-  chrome.alarms.clear("focusSessionEnd");
-  chrome.action.setBadgeText({ text: "" });
+  chrome.runtime.sendMessage({
+    type: "clearFocusSessionAlarmAndBadge",
+  });
 }
 
 function setupInputValidation(hrInput, minInput, secInput) {
