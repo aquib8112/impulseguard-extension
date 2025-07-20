@@ -31,19 +31,12 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "blocked/blocked.html",
-        "src/settings/settings.html",
-        "resources/icons/default_icon.png",
-        "src/visionboard/visionboard.html"
+        "../../src/blocked/blocked.html",
+        "../../src/settings/settings.html",
+        "../../resources/icons/default_icon.png",
+        "../../src/visionboard/visionboard.html"
       ],
-      "matches": ["<all_urls>"]
-    }
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "use_dynamic_url": true
     }
   ]
 }
